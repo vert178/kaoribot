@@ -2,8 +2,12 @@ const Excel = require('exceljs');
 const workbook = new Excel.Workbook(); 
 const filename = (`data.xlsx`);
 const Discord = require('discord.js');
+const fs = require('fs');
+const Utility = require(`./utility.js`);
+const Constants = require(`./constants.js`);
 
-module.exports = { name : "exutil",
+module.exports = {
+
     async loadExcel (reload) {
         if(reload)
         {
@@ -16,53 +20,26 @@ module.exports = { name : "exutil",
         return workbook;
     },
 
+    getVoteInfo (id, votesheet) {
+        return [countNonEmpty(votesheet.getRow(6 * id + 1), votesheet), 
+            countNonEmpty(votesheet.getRow(6 * id + 2), votesheet), 
+            countNonEmpty(votesheet.getRow(6 * id + 3), votesheet), 
+            countNonEmpty(votesheet.getRow(6 * id + 4), votesheet)];
+    },
+
     createPieceEmbed (piecename, comp, lvl, dur, link, desc, prd, sonata, etude, ver, searchString) {
 
-        function getDur (dur) {
-            if (dur) return `About ${dur} minutes`;
-            else return 'I don\'t know lmao';
-        }
-
-        var isVerified = function verification(value) {
-            if(value) return "This is a verified entry. Please feel free to use it.";
-            return "This is NOT a verified entry. Please take the information cautiously";
-        }
-
-        var period = function piecePeriod(value) {
-            switch (value) {
-            case 1:
-                return 'Baroque period';
-            case 2:
-                return 'Classical period';
-            case 3:
-                return 'Romantic period';
-            case 4:
-                return 'Modern / 20th Century';
-            default:
-                return `N/A`;
-            }
-        }
-
-        var check = function checkemoji(value){
-            try{
-                if (value) return '✅';
-                else return '❌';   
-            } catch(error){
-                console.log(error);
-                return '❌';
-            }
-        }
-
-        var nametext = stringTransform(piecename);
-        var comptext = stringTransform(comp);
-        var lvltext = stringTransform(lvl);
+        var nametext = Utility.stringTransform(piecename);
+        var comptext = Utility.stringTransform(comp);
+        var lvltext = Utility.stringTransform(lvl);
         var durtext = getDur(dur);
-        var linktext = stringTransform(link);
-        var desctext = stringTransform(desc);
-        var verify = isVerified(ver);
-        var prdtext = period(prd);
-        var son = check(sonata);
-        var et = check(etude);
+        var linktext = Utility.stringTransform(link);
+        var desctext = Utility.stringTransform(desc);
+        var verify = Utility.CheckIf(ver, "This is a verified entry. Please feel free to use it.", 
+        "This is NOT a verified entry. Please take the information cautiously");
+        var prdtext = piecePeriod(prd);
+        var son = Utility.CheckIf(sonata, '✅', '❌');
+        var et = Utility.CheckIf(etude, '✅', '❌');
 
         return new Discord.MessageEmbed()
                 .setColor('#fbefa4')
@@ -88,14 +65,14 @@ module.exports = { name : "exutil",
 
     createGlossaryEmbed(term, upvoteInfo, title, author, desc, links) {
         //How many upvotes are required to officially verify an entry
-        const verifyVotes = 2;
+        const verifyVotes = 3;
 
-        var termText = stringTransform(term);
+        var termText = Utility.stringTransform(term);
         var advancedUpvotes = upvoteInfo[2] - upvoteInfo[3];
         var upvotes = advancedUpvotes + upvoteInfo[0] - upvoteInfo[1];
-        var titleText = stringTransform(title);
-        var authorText = stringTransform(author);
-        var description = stringTransform(desc);
+        var titleText = Utility.stringTransform(title);
+        var authorText = Utility.stringTransform(author);
+        var description = Utility.stringTransform(desc);
         var linkInfo = links.length;
         var isVerified = advancedUpvotes >= verifyVotes;
 
@@ -106,8 +83,12 @@ module.exports = { name : "exutil",
 
         var linksConcat = `\u200b`;
         for (i=0; i < linkInfo; i++){
-            linksConcat += links[i];
-            linksConcat += `\n`;
+            l = '';
+            if (links[i] && typeof(links[i]) === 'object') l = links[i].text;
+            else if (typeof(links[i]) === 'string') l = links[i];
+
+            linksConcat += Utility.stringTransform(l);
+            if (!Utility.CheckIfEmpty(l)) linksConcat += `\n`;
         }
 
         //Returns a ready embed
@@ -123,11 +104,48 @@ module.exports = { name : "exutil",
         )
         .setFooter(footer);
     },
+
+    // storeFaqData(initiator, author, title, description, links) {
+    //     var data = [];
+    //     //id = Look for next available id
+    //     data[Constants.infoArr[0]] = initiator;
+    //     data[Constants.infoArr[1]] = id;
+    //     data[Constants.infoArr[2]] = author;
+    //     data[Constants.infoArr[3]] = title;
+    //     data[Constants.infoArr[4]] = description;
+
+    //     for (i=0; i < links.length; i++) {
+    //         data[Constants.infoArr[5 + i]] = links[i];
+    //     }
+        
+    //     return data;
+    // }
 };
 
+function countNonEmpty (row, sheet) {
+    var j = 0;
+    for (i=1; i <= sheet.actualColumnCount + 1; i++) {
+        if(row.getCell(i).value)  j += 1;
+    }
+    return j;
+}
 
-function stringTransform (string) {
-    var str = '\u200B';
-    if (string) str = string;
-    return str;
+function getDur (dur) {
+    if (dur) return `About ${dur} minutes`;
+    else return 'I don\'t know lmao';
+}
+
+function piecePeriod(value) {
+    switch (value) {
+    case 1:
+        return 'Baroque period';
+    case 2:
+        return 'Classical period';
+    case 3:
+        return 'Romantic period';
+    case 4:
+        return 'Modern / 20th Century';
+    default:
+        return `N/A`;
+    }
 }

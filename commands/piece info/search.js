@@ -1,8 +1,7 @@
-const Discord = require('discord.js');
-const Excel = require('exceljs');
-const fs = require('fs');
 const AccurateSearch = require('accurate-search');
+const Constants = require(`../utilities/constants.js`);
 const ExcelUtility = require(`./../utilities/excelutility.js`);
+const Utility = require(`./../utilities/utility.js`);
 
 const maxResultsPushed = 5;
 
@@ -11,8 +10,6 @@ var errortexts = ["I can't locate the database for some reason :frowning:",
 "Hmmm something strange happened maybe try again. :frowning:"];
 
 var errortext = "\ \ Please tell vert if this problem persists";
-
-var emojis = ["🗑️", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣"];
 
 module.exports = {
     name: `search`,
@@ -27,6 +24,8 @@ module.exports = {
         const workbook = await ExcelUtility.loadExcel(true);
         const worksheet = workbook.worksheets[0];
 
+        var searchString = Utility.RemergeArgs(args);
+
         //Start search
         let accurateSearch = new AccurateSearch();
 
@@ -38,13 +37,6 @@ module.exports = {
         });
         
         accurateSearch.remove(1);
-
-        //Put everything in the arguement together
-        var searchString = ` `;
-        for (i=0; i < args.length; i++){
-            searchString += args[i];
-            searchString += ' ';
-        }
 
         var foundIds = accurateSearch.search(searchString);
 
@@ -69,7 +61,7 @@ module.exports = {
             
             //Sets up filter and reacts to the message, then wait for user response
             var filter = (reaction, user) => {
-                return emojis.includes(reaction.emoji.name) && user.id === message.author.id;
+                return Constants.emojis.includes(reaction.emoji.name) && user.id === message.author.id;
               };
         
               // Create the collector
@@ -79,7 +71,7 @@ module.exports = {
                 });
             
               collector.on('collect', (reaction, user) => {
-                resultId = emojis.indexOf(reaction.emoji.name);
+                resultId = Constants.emojis.indexOf(reaction.emoji.name);
                 // console.log(`Collected ${resultId} from ${user.tag}`);
                 if (resultId === 0) {
                     promptMessage.delete();
@@ -95,12 +87,12 @@ module.exports = {
                 message.channel.send(resultEmbed);
             });
             
-            //reacts with the number emojis
+            //reacts with the number Constants.emojis
             try {
                 for(i=1; i <= foundLen; i++){
-                    await promptMessage.react(emojis[i]);
+                    await promptMessage.react(Constants.emojis[i]);
                 }
-                await promptMessage.react(emojis[0]);
+                await promptMessage.react(Constants.emojis[0]);
             } catch (error) {
                 console.error('Reaction failed');
                 promptMessage.delete();

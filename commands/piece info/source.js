@@ -5,7 +5,7 @@ const ExcelUtility = require(`./../utilities/excelutility.js`);
 module.exports = {
     name: `source`,
     description: `Gives you a link to my source code or the data . `,
-    args: [`code`, `data`],
+    args: [`code`, `data`, 'template'],
     example: `Kaori, source data`,
     cooldown: 5,
     minArgs: 1,
@@ -14,6 +14,8 @@ module.exports = {
         const workbook = await ExcelUtility.loadExcel(true);
 
         const votesheet = workbook.worksheets[2];
+
+        if (!args[0]) return message.channel.send(`What are you trying to ask for?`);
 
         switch (args[0].toLowerCase().trim())
         {
