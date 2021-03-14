@@ -1,7 +1,8 @@
 const fs = require('fs');
 
 module.exports = {
-	name: 'debug',
+	name: 'reload',
+    alias: ['r'],
 	description: 'Why do you even care',
     hidden: true,
 	execute(message, args) {

@@ -1,9 +1,8 @@
 const Discord = require('discord.js');
 const Excel = require('exceljs');
-const filename = (`data.xlsx`)
-// const FileReader = require(`FileReader`);
 const fs = require('fs');
-const path = require('path');
+const AccurateSearch = require('accurate-search');
+const filename = (`data.xlsx`)
 const workbook = new Excel.Workbook(); 
 var errortexts = ["I can't locate the database for some reason :sad:",
 "I can't index the database for some reason :sad:",
@@ -16,24 +15,30 @@ module.exports = {
     alias: [`find`, `s`],
     args: [`\"The name of the piece you wanna search\"`],
     example: `Kaori, search Chopin Waterfall Etude`,
-    cooldown: 1,
+    cooldown: 5,
 	async execute(message, args) {
-        //Read database asynchrously
-        // var data = fs.readFile(path.join(__dirname + '/../data.xlsx'), 'utf8', (error, data) => {
-        //     if (error) {
-        //         console.log(error);
-        //         message.channel.send(errortexts[0] + ` ` + errortext);
-        //     }
-        //   });
         
-        // message.channel.send(`Oki please wait a sec`);
-        // const workbook = new Excel.Workbook();
-        // await workbook.xlsx.load(data);
-        // message.channel.send(`load success`);
-        const filepath = path.join(__dirname + '/../data.xlsx');
-        await workbook.xlsx.readFile(filename);
+        //Only index the database if the workbook isnt already reloaded
+        if(!workbook.creator)
+        {
+            try{
+                await workbook.xlsx.readFile(filename);
+            }catch(error){
+                message.channel.send(errortexts[1] + ` ` + errortext);
+            }
+        }
+
+        
         const worksheet = workbook.getWorksheet(1);
-        const cell = worksheet.getCell(`B1`);
-        message.channel.send(cell.value);
+
+        console.log(!workbook.creator);
+        
+        //Start search
+        let accurateSearch = new AccurateSearch()
+
+        worksheet.eachRow(function(row, rowNumber) {
+            console.log(`${row.getCell(2)} ${row.getCell(1)}, ${rowNumber}`);
+        });
+          
 	},
 };

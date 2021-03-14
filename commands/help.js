@@ -1,4 +1,4 @@
-const { prefix } = require('./../config.json');
+const { prefix, prefix2 } = require('./../config.json');
 module.exports = {
     name: `help`,
     description: `Well...`,
@@ -15,7 +15,9 @@ module.exports = {
         console.log(filteredCommands);
         
         if (!args.length) {
-            data.push('Here\'s a list of stuff that I can do:');
+            data.push(`\n Use the prefix \"${prefix}\" before a command. `);
+            data.push(`\n Alternatively, you can use \"${prefix2}\", but of course I want you to call me by my full name...`);
+            data.push('\n\n\n Anyway here\'s a list of stuff that I can do:');
             data.push(filteredCommands.map(command => command.name).join(', '));
             data.push(`\nAsk again with \`${prefix}help [command name]\` if you want more info`);
 
