@@ -64,7 +64,7 @@ client.on("message", message => {
 
         if (now < expirationTime) {
             const timeLeft = (expirationTime - now) / 1000;
-            return message.reply(`Wait ${timeLeft.toFixed(0)} more seconds before asking nyaaa I need some rest.`);
+            return message.reply(`Wait ${timeLeft.toFixed(0)} more seconds before asking I need some rest.`);
         }
     }
     timestamps.set(message.author.id, now);

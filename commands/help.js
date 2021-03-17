@@ -11,8 +11,6 @@ module.exports = {
         const filteredCommands = commands.filter(function( command ) {
             return !command.hidden;
         });
-
-        console.log(filteredCommands);
         
         if (!args.length) {
             data.push(`\n Use the prefix \"${prefix}\" before a command. `);

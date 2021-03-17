@@ -28,17 +28,32 @@ module.exports = {
             }
         }
 
-        
         const worksheet = workbook.getWorksheet(1);
-
-        console.log(!workbook.creator);
         
         //Start search
         let accurateSearch = new AccurateSearch()
 
+        //Index database
         worksheet.eachRow(function(row, rowNumber) {
-            console.log(`${row.getCell(2)} ${row.getCell(1)}, ${rowNumber}`);
+            var composer = row.getCell(2);
+            var pieceName = row.getCell(1);
+            accurateSearch.addText(rowNumber, composer + pieceName);
         });
-          
+
+        var searchString = ` `;
+        for (i=0; i < args.length; i++){
+            searchString += args[i];
+            searchString += ' ';
+        }
+
+        var foundIds = accurateSearch.search(searchString);
+
+        var data = [];
+
+        data.push(`Name : ${worksheet.getRow(foundIds[0]).getCell(1).value}`);
+        data.push(`Composer : ${worksheet.getRow(foundIds[0]).getCell(2).value}`);
+        data.push(`Level : ${worksheet.getRow(foundIds[0]).getCell(3).value}`);
+
+        message.channel.send(data);
 	},
 };
