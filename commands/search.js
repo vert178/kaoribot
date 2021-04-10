@@ -77,7 +77,7 @@ module.exports = {
             
             //Sets up filter and reacts to the message, then wait for user response
             var filter = (reaction, user) => {
-                return emojis.includes(reaction.emoji.name) && !user.bot;
+                return emojis.includes(reaction.emoji.name) && user.id === message.author.id;
               };
 
             var options = {
@@ -115,7 +115,7 @@ module.exports = {
                 var check = function checkemoji(value){
                     try{
                         if (value){
-                            return ':white_check_mark:';
+                            return '✅';
                         }else{
                             return '❌';
                         }
@@ -171,10 +171,6 @@ module.exports = {
                 message.channel.send(errortexts[2] + ` ` + errortext);
                 return;
             }
-
-            
         });
-
-
 	},
 };
