@@ -6,13 +6,15 @@ module.exports = {
 	description: 'Why do you even care',
     hidden: true,
 	execute(message, args) {
-		if (!args.length) return message.channel.send(`Yes?`);
+		//Try to find command
+        if (!args.length) return message.channel.send(`Yes?`);
             const commandName = args[0].toLowerCase();
             const command = message.client.commands.get(commandName)
 	            || message.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
             if (!command) return message.channel.send(`No thats not how it works`);
 
+        //Delete the cache
         try{
             delete require.cache[require.resolve(`./${command.name}.js`)];
         }catch (error) {
@@ -21,6 +23,7 @@ module.exports = {
             return;
         }
 
+        //Reloads command
         try {
             const newCommand = require(`./${command.name}.js`);
             message.client.commands.set(newCommand.name, newCommand);
@@ -29,6 +32,7 @@ module.exports = {
             message.channel.send(`Hm strange I can't ${command.name}... I mean you are not supposed to touch debug anyways`);
         }
 
+        //Sends message to confirm reload
         message.channel.send(`${command.name}\? Ok sure`);
 	},
 };
