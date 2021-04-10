@@ -30,6 +30,7 @@ module.exports = {
         } catch (error) {
             console.error(error);
             message.channel.send(`Hm strange I can't ${command.name}... I mean you are not supposed to touch debug anyways`);
+            return;
         }
 
         //Sends message to confirm reload
