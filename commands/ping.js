@@ -14,7 +14,7 @@ module.exports = {
             \nTook : ${latency}`);
         }
         else {
-            message.channel.send(`Hiya I am ${latency}ms late. Not too bad UwU`);
+            message.channel.send(`Hiya I am ${latency}ms late. Not too bad :smile:`);
         }
 	},
 };

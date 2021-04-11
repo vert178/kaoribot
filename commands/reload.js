@@ -19,7 +19,7 @@ module.exports = {
             delete require.cache[require.resolve(`./${command.name}.js`)];
         }catch (error) {
             console.log(error);
-            message.channel.send(`Wahh you just broke me :sad:`);
+            message.channel.send(`Wahh you just broke me :sob:`);
             return;
         }
 
@@ -34,7 +34,8 @@ module.exports = {
         }
 
         //Sends message to confirm reload
-        message.channel.send(`${command.name}\? Ok sure`);
+        message.channel.send(`${command.name}\? ok sure`);
+
         console.log(`======================================================================================================= \n
         ===================================== Reloaded ${command.name} ======================================= \n
         =======================================================================================================`);
