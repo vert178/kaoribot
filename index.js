@@ -52,6 +52,10 @@ client.on("message", message => {
 
     if (!command) return;
 
+    if (command.serverOnly && message.channel.type === 'dm') {
+        return message.reply('This is dms, and it\'s not exactly the best place to play with this command...');
+    }
+
     //Process cooldown
     if (!cooldowns.has(command.name)) {
         cooldowns.set(command.name, new Discord.Collection());
@@ -75,6 +79,6 @@ client.on("message", message => {
         command.execute(message, args);
     } catch (error) {
         console.error(error);
-        message.channel.send(`Error: \n ${error}`);
+        message.channel.send(`Something went wrong! \n ${error}`);
     }
 });

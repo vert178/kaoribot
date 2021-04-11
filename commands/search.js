@@ -35,7 +35,7 @@ module.exports = {
             }
         }
 
-        const worksheet = workbook.getWorksheet(1);
+        const worksheet = workbook.worksheets[0];
         
         //Start search
         let accurateSearch = new AccurateSearch()
@@ -140,14 +140,14 @@ module.exports = {
                 .setColor('#fbefa4')
                 .setAuthor('Kaori' , 'https://i.imgur.com/lxTn3yl.jpg')
                 .setDescription(`Here you go! The information for ${searchString}`)
-                .setThumbnail('https://i.imgur.com/X2ttwUo.png')
+                .setThumbnail('https://i.imgur.com/CyjXR7H.png')
                 .addFields(
                 { name: 'Name ', value: r.getCell(1).value },
                 { name: 'Composer', value: r.getCell(2).value, inline: true },
                 { name: 'Level', value: r.getCell(3).value, inline: true },
                 { name: 'Duration', value: `About ${r.getCell(5).value} minutes`},
                 { name: 'Recommended performance', value: r.getCell(9).value},
-                { name: '\u200B', value: 'Audition information' },
+                { name: '\u200B', value: '**Audition information**' },
                 { name: 'Period', value: period(r.getCell(6).value), inline: true },
                 { name: 'Sonata?', value: check(r.getCell(7).value), inline: true },
                 { name: 'Etude?', value: check(r.getCell(8).value), inline: true },

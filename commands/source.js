@@ -17,7 +17,7 @@ module.exports = {
                 message.channel.send(attachment);
             } catch(error) {
                 console.log(error);
-                message.channel.send(`I can't find the file somehow :( Try again later`);
+                message.channel.send(`I can't index the file somehow :( Try again later`);
             }
             
         } 
