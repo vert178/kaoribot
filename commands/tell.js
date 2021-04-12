@@ -23,7 +23,8 @@ const errortext = "\ Please tell vert if this problem persists";
 
 const errortexts = ["We are experiencing some problems with updooting. Please try again later :frowning:",];
 
-const emojis = ["⬇️", "⬆️",];
+const upvoteTexts = ["upvote", "⬆️", "up", "updoot", "good girl", "good bot"];
+const downvoteTexts = ["downvote", "⬇️", "down", "downdoot", "bad girl", "bad bot"];
 
 //An array of role ids that are allowed to verify stuff. Currently in the following order:
 //Advanced, Proficient, Virtuoso, Staff
@@ -59,6 +60,7 @@ module.exports = {
 
         //message.channel.send(`${worksheet.actualRowCount}, ${rowNr}`);
 
+        // rownumber > 0 <=> we can find a match
         if (rowNr > 0){
             var row = worksheet.getRow(rowNr);
 
@@ -69,8 +71,10 @@ module.exports = {
                 if (message.channel.type === 'dm') return;
 
                 //Sets up emoji filter for upvoting purposes
-                var emojiFilter = (reaction, user) => {
-                    return emojis.includes(reaction.emoji.name) && !user.bot;
+                var messageFilter = (msg, user) => {
+                    return !user.bot && 
+                    msg.reference != null &&
+                    msg.reference.messageID === result.id;
                 };
                 
                 var options = {
@@ -78,63 +82,80 @@ module.exports = {
                     time: 999000,
                 }
 
-                var emojiCollector = result.createReactionCollector(emojiFilter, options);
-                emojiCollector.on('collect', async (reaction, user) => {
+                var messageCollector = result.channel.createMessageCollector(messageFilter, options);
+                messageCollector.on('collect', async (msg, user) => {
 
                     //Check if user has advanced
-                    var userHasAdvanced = CheckIfMemberHasRole(reaction.member);
-
-                    //Look for 6n + k row
+                    var userHasAdvanced = CheckIfMemberHasRole(msg.member);
+                    
                     var index = userHasAdvanced ? 6 * rowNr : 6 * rowNr + 2;
                     var upvotes = votesheet.getRow(index);
                     var downvotes = votesheet.getRow(index + 1);
 
+                    var isUpvote = upvoteTexts.includes(msg.content.trim());
+                    var isDownvote = downvoteTexts.includes(msg.content.trim());
+
                     //Check if user tag is in that row
                     //If yes, delete the entry
-                    var resultId = emojis.indexOf(reaction.emoji.name);
 
-                    console.log(`User ${user.tag} is Advanced: ${userHasAdvanced}, 
-                    Index: ${index}
-                    Entry Nr: ${rowNr}
-                    ReactionID: ${resultId}`);
+                    // msg.channel.send(`User ${msg.author.tag} is Advanced: ${userHasAdvanced}, 
+                    // Index: ${index}
+                    // Entry Nr: ${rowNr}
+                    // Msg.content: ${msg.content.trim()}
+                    // Upvote? ${isUpvote}; Downvote? ${isDownvote}`);
 
                     //Check if user has upvoted before - deletes entry
-                    RemoveEntryFromRow(upvotes, user);
+                    RemoveEntryFromRow(upvotes, msg.author);
                     RemoveEntryFromRow(downvotes, user);
 
                     var infoIndex = userHasAdvanced ? infoArr[1] : infoArr[1] + 2;
 
-                    if (resultId === 1) {
-                        if(AddEntryToRow(upvotes, user)) console.log(`${user.tag} upvoted`);
-                        row.getCell(infoIndex).value += 1;
+                    var isVoted = false;
+
+                    //Process vote
+                    if (isUpvote) {
+                        if(AddEntryToRow(upvotes, msg.author)) {
+                            console.log(`${msg.author.tag} upvoted`);
+                            row.getCell(infoIndex).value += 1;
+                            isVoted = true;
+                            await msg.react(`😄`);
+                        }
+
                     }
+                    else if (isDownvote) {
+                        if(AddEntryToRow(downvotes, msg.author)){
+                            console.log(`${msg.author.tag} downvoted`);
+                            row.getCell(infoIndex).value += (-1);
+                            isVoted = true;
+                            await msg.react(`😔`);
+                        } 
+                    } 
                     else {
-                        if(AddEntryToRow(downvotes, user)) console.log(`${user.tag} downvoted`);
-                        row.getCell(infoIndex).value += (-1);
+                        // Do nothing
+                        // console.log(`aborting: not upvote nor downvote`);
                     }
 
                     //Write new data
-                    try{
-                        await workbook.xlsx.writeFile(filename);
-                        console.log(`Updated vote info`);
-                    }
-                    catch(error){
-                        console.log(error);
-                        message.channel.send(errortexts[0] + ` ` + errortext);
-                        result.delete();
-                        return;
+                    if (isVoted)
+                    {
+                        isVoted = false;
+                        try{
+                            await workbook.xlsx.writeFile(filename);
+                            console.log(`Updated vote info`);
+                        }
+                        catch(error){
+                            console.log(error);
+                            message.channel.send(errortexts[0] + ` ` + errortext);
+                            result.delete();
+                            return;
+                        }
                     }
                 });
 
                 //Delets the message when time is over
-                emojiCollector.on('end', (reaction, user) => {
-                    result.reactions.removeAll()
-                        .catch(error => console.error('Failed to clear reactions: ', error));
+                messageCollector.on('end', (msg, user) => {
+                    // Do nothing for current version
                 });
-
-
-                //Reacts to message
-                if (!react(result)) return;
             });
         }
         else {
@@ -158,14 +179,14 @@ module.exports = {
         function embed(row) {
             
             //Calculates up/down vote info and prepares other info
-            var upvotes = row.getCell(infoArr[1]).length - row.getCell(infoArr[1]+1).length
-            var advancedUpvotes = row.getCell(infoArr[1] + 2).length - row.getCell(infoArr[1] + 3).length
+            var upvotes = row.getCell(infoArr[1]).value - row.getCell(infoArr[1]+1).value
+            var advancedUpvotes = row.getCell(infoArr[1] + 2).value - row.getCell(infoArr[1] + 3).value
             var title = row.getCell(infoArr[2] + 1).value;
             var author = row.getCell(infoArr[2]).value;
             var description = row.getCell(infoArr[2] + 2).value;
             var linkInfo = row.getCell(infoArr[2] + 3).value;
             var isVerified = advancedUpvotes >= verifyVotes;
-            var verificationText = advancedUpvotes >= isVerified ? texts[3] : texts[2];
+            var verificationText = isVerified ? texts[3] : texts[2];
 
             //Concat all links using info in second last column (how many links are there)
             var linksConcat = `\u200b`;
@@ -176,14 +197,14 @@ module.exports = {
                 linksConcat += `\n`;
             }
 
-            // message.channel.send(`Debug message: 
-            // Upvodes: ${upvotes}, 
-            // AdvUpvotes: ${advancedUpvotes}, 
-            // Title: ${title}, 
-            // Author: ${author}, 
-            // Desc: ${description}, 
-            // Link info: ${linkInfo}, 
-            // isVerified? ${isVerified}`);
+            message.channel.send(`Debug message: 
+            Upvodes: ${upvotes}, 
+            AdvUpvotes: ${advancedUpvotes}, 
+            Title: ${title}, 
+            Author: ${author}, 
+            Desc: ${description}, 
+            Link info: ${linkInfo}, 
+            isVerified? ${isVerified}`);
             
             //Returns a ready embed
             return new Discord.MessageEmbed()
@@ -215,7 +236,7 @@ module.exports = {
 
         function CheckIfMemberHasRole (member) {
             var roleOfMember = member._roles;
-            console.log(roleOfMember);
+            // console.log(roleOfMember);
 
             var z = roleOfMember.filter(function(val) {
                 return permittedRoles.indexOf(val) != -1;
@@ -226,9 +247,11 @@ module.exports = {
 
         //Check if user tag is present in that row and removes the entry
         function RemoveEntryFromRow (row, user) {
+            // console.log(`Yes, we are trying to remove entry`);
             row.eachCell(function(cell, colNumber) {
-                console.log('Check removefromentry: Cell ' + colNumber + ' = ' + cell.value);
-                if(cell.value.trim() === user.tag.trim()) {
+                // var isMatch = cell.value.trim() === user.tag.trim()
+                // console.log('Check removefromentry: Cell ' + colNumber + ' = ' + cell.value + ` isMatch = ` + isMatch);
+                if(user != null && cell.value.trim() === user.tag.trim()) {
                     row.splice(colNumber, 1);
                 }
             });
@@ -236,13 +259,16 @@ module.exports = {
 
         //Adds user tag to entry. Returns true if add is successful
         function AddEntryToRow (row, user) {
-            row.eachCell({ includeEmpty: true }, function(cell, colNumber) {
-                console.log('Check addfromentry: Cell ' + colNumber + ' = ' + cell.value);
-                if(!cell.value) {
-                    cell.value = user.tag;
+            // console.log(`Yes, we are trying to add entry`);
+            //A little variable here so that we dont need to check that many rows
+            for (i=1; i <= votesheet.actualColumnCount + 1; i++){
+                var cellValue = row.getCell(i).value;
+                // console.log('Check addfromentry: Cell ' + i + ' = ' + cellValue);
+                if(cellValue === null) {
+                    row.getCell(i).value = user.tag;
                     return true;
                 }
-            });
+            }
             return false;
         }
 	},

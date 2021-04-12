@@ -11,6 +11,10 @@ module.exports = {
 	execute(message, args) {
         
         message.channel.send('This is made for some experiments. How did you even end up here?');
+        var user = message.author;
+        var server = message.guild;
+
+        console.log(message.reference === null);
         // var targetMemberRoles = message.mentions.members.first()._roles;
         // message.channel.send(`This lad has the following roles: ${targetMember._roles}`);
 

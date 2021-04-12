@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "accurate-search": "^1.2.12",
+    "discord-reply": "^0.1.2",
     "discord.js": "^12.5.1",
     "exceljs": "^4.2.1",
     "git": "^0.1.5"
