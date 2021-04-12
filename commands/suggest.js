@@ -26,6 +26,7 @@ const emojis = ["❌", "✅",];
 
 module.exports = {
     name: `suggest`,
+    alias: ['sg'],
     description: `Suggests info for bot-faq function. Still in development so it might not function correctly`,
     args: [`\"The command name you want to suggest\"`],
     example: `Kaori, suggest melody`,

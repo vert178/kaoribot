@@ -36,7 +36,7 @@ const permittedRoles = ["402936943018639381",
 module.exports = {
     name: `tell`,
     description: `Looks up info for bot-faq function. Still in development so it might not function correctly`,
-    alias: [`answer`],
+    alias: [`answer`, `t`,],
     example: `Kaori, tell melody`,
     cooldown: 5,
 	async execute(message, args) {

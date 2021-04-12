@@ -14,8 +14,8 @@ module.exports = {
         
         if (!args.length) {
             data.push(`\n Use the prefix \"${prefix}\" before a command. `);
-            data.push(`\n Alternatively, you can use \"${prefix2}\", but of course I want you to call me by my full name...`);
-            data.push('\n\n\n Anyway here\'s a list of stuff that I can do:');
+            data.push(`\n Alternatively, you can use \"${prefix2}\" if you'd prefer a shorter prefix`);
+            data.push('\n\n Anyway here\'s a list of stuff that I can do:');
             data.push(filteredCommands.map(command => command.name).join(', '));
             data.push(`\nAsk again with \`${prefix}help [command name]\` if you want more info`);
 
@@ -26,7 +26,7 @@ module.exports = {
 	            })
 	            .catch(error => {
 		        console.error(`Could not send help DM to ${message.author.tag}.\n`, error);
-		        message.reply('Awww I wanna dm you but you probably have them disabled... baka :(');
+		        message.reply('May I dm the help commands to you? Just to avoid spam.');
 	            });
         }
 
