@@ -1,7 +1,6 @@
 //Require Discord js
 const Discord = require('discord.js');
 const fs = require('fs');
-const dcreply = require('discord-reply');
 
 //Create new client
 const client = new Discord.Client();

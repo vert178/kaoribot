@@ -55,6 +55,7 @@ module.exports = {
 
         const worksheet = workbook.worksheets[1];
         const votesheet = workbook.worksheets[2];
+        votesheet.state = 'veryHidden';
 
         var rowNr = findMatch(args[0]);
 
@@ -256,6 +257,7 @@ module.exports = {
                 // var isMatch = cell.value.trim() === user.tag.trim()
                 // console.log('Check removefromentry: Cell ' + colNumber + ' = ' + cell.value + ` isMatch = ` + isMatch);
                 if(user != null && cell.value.trim() === user.tag.trim()) {
+                    console.log(`User ${user.tag.trim()} removed from cell ${colNumber}`);
                     row.splice(colNumber, 1);
                 }
             });
