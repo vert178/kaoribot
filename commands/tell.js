@@ -13,7 +13,7 @@ const verifyVotes = 3;
 
 const texts = ["I can't find a match for your query :frowning: maybe try again\? You can also say \"Kaori, suggest",
 "\" to make a new entry!",
-"This is an entry verified by advanced and proficient pianists in this server :smile: Please feel free to use it!",
+"This is an entry verified by advanced and proficient pianists in this server :white_check_mark: Please feel free to use it!",
 "This is not an entry verified by advanceds and proficients in this server :x: Please take the information with a grain of salt",
 "This entry has",
 "votes and approved by",
@@ -118,7 +118,6 @@ module.exports = {
                             console.log(`${msg.author.tag} upvoted`);
                             row.getCell(infoIndex).value += 1;
                             isVoted = true;
-                            await msg.react(`😄`);
                         }
 
                     }
@@ -127,7 +126,6 @@ module.exports = {
                             console.log(`${msg.author.tag} downvoted`);
                             row.getCell(infoIndex).value += (-1);
                             isVoted = true;
-                            await msg.react(`😔`);
                         } 
                     } 
                     else {
@@ -142,6 +140,9 @@ module.exports = {
                         try{
                             await workbook.xlsx.writeFile(filename);
                             console.log(`Updated vote info`);
+
+                            if (isUpvote) await msg.react(`😄`);
+                            else if (isDownvote) await msg.react(`😔`);
                         }
                         catch(error){
                             console.log(error);
@@ -179,14 +180,14 @@ module.exports = {
         function embed(row) {
             
             //Calculates up/down vote info and prepares other info
-            var upvotes = row.getCell(infoArr[1]).value - row.getCell(infoArr[1]+1).value
-            var advancedUpvotes = row.getCell(infoArr[1] + 2).value - row.getCell(infoArr[1] + 3).value
+            var advancedUpvotes = row.getCell(infoArr[1]).value - row.getCell(infoArr[1] + 1).value
+            var upvotes = advancedUpvotes + row.getCell(infoArr[1] + 2).value - row.getCell(infoArr[1] + 3).value
             var title = row.getCell(infoArr[2] + 1).value;
             var author = row.getCell(infoArr[2]).value;
             var description = row.getCell(infoArr[2] + 2).value;
             var linkInfo = row.getCell(infoArr[2] + 3).value;
             var isVerified = advancedUpvotes >= verifyVotes;
-            var verificationText = isVerified ? texts[3] : texts[2];
+            var verificationText = isVerified ? texts[2] : texts[3];
 
             //Concat all links using info in second last column (how many links are there)
             var linksConcat = `\u200b`;
@@ -197,14 +198,17 @@ module.exports = {
                 linksConcat += `\n`;
             }
 
-            message.channel.send(`Debug message: 
-            Upvodes: ${upvotes}, 
-            AdvUpvotes: ${advancedUpvotes}, 
-            Title: ${title}, 
-            Author: ${author}, 
-            Desc: ${description}, 
-            Link info: ${linkInfo}, 
-            isVerified? ${isVerified}`);
+            var footer = `${texts[4]} ${upvotes} ${texts[5]} ${advancedUpvotes} ${texts[6]} ${author}`;
+
+            // message.channel.send(`Debug message: 
+            // Upvodes: ${upvotes}, 
+            // AdvUpvotes: ${advancedUpvotes}, 
+            // Title: ${title}, 
+            // Author: ${author}, 
+            // Desc: ${description}, 
+            // Link info: ${linkInfo}, 
+            // isVerified? ${isVerified}
+            // Footer: ${footer}`);
             
             //Returns a ready embed
             return new Discord.MessageEmbed()
@@ -217,7 +221,7 @@ module.exports = {
             { name: 'Links', value: linksConcat},
             { name: '\u200b', value: verificationText},
             )
-            .setFooter(`${texts[5]} ${upvotes} ${texts[6]} ${advancedUpvotes} ${texts[7]} ${author}`);
+            .setFooter(footer);
         }
 
         var react = async function setReaction(msg) {
