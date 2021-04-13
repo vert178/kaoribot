@@ -53,6 +53,10 @@ module.exports = {
             }
         }
 
+        if (args[0] === null) {
+            return message.channel.send(`Please specify which piece you want me to tell!`);
+        }
+
         const worksheet = workbook.worksheets[1];
         const votesheet = workbook.worksheets[2];
         votesheet.state = 'veryHidden';
@@ -252,6 +256,7 @@ module.exports = {
 
         //Check if user tag is present in that row and removes the entry
         function RemoveEntryFromRow (row, user) {
+            if (user === null) return;
             // console.log(`Yes, we are trying to remove entry`);
             row.eachCell(function(cell, colNumber) {
                 // var isMatch = cell.value.trim() === user.tag.trim()
@@ -272,6 +277,7 @@ module.exports = {
                 // console.log('Check addfromentry: Cell ' + i + ' = ' + cellValue);
                 if(cellValue === null) {
                     row.getCell(i).value = user.tag;
+                    console.log(`Updated ${user.tag} to column ${i}`);
                     return true;
                 }
             }

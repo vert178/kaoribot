@@ -8,7 +8,7 @@ const workbook = new Excel.Workbook();
 const maxResultsPushed = 5;
 
 var errortexts = ["I can't locate the database for some reason :frowning:",
-"I can't index the database for some reason :frowning:",
+"Whoops I can't find anything",
 "Hmmm something strange happened maybe try again. :frowning:"];
 
 var errortext = "\ \ Please tell vert if this problem persists";
@@ -116,7 +116,8 @@ module.exports = {
                     try{
                         if (value){
                             return '✅';
-                        }else{
+                        }
+                        else{
                             return '❌';
                         }
                     } catch(error){
@@ -136,23 +137,30 @@ module.exports = {
                 
                 var r = worksheet.getRow(foundIds[resultId - 1]);
 
+                var name = stringTransform(r.getCell(1).value);
+                var comp = stringTransform(r.getCell(2).value);
+                var lvl = stringTransform(r.getCell(3).value);
+                var dur = getDur(r.getCell(5).value);
+                var link = stringTransform(r.getCell(9).value);
+                var desc = stringTransform(r.getCell(10).value);
+
                 var resultEmbed = new Discord.MessageEmbed()
                 .setColor('#fbefa4')
                 .setAuthor('Kaori' , 'https://i.imgur.com/lxTn3yl.jpg')
                 .setDescription(`Here you go! The information for ${searchString}`)
                 .setThumbnail('https://i.imgur.com/CyjXR7H.png')
                 .addFields(
-                { name: 'Name ', value: r.getCell(1).value },
-                { name: 'Composer', value: r.getCell(2).value, inline: true },
-                { name: 'Level', value: r.getCell(3).value, inline: true },
-                { name: 'Duration', value: `About ${r.getCell(5).value} minutes`},
-                { name: 'Recommended performance', value: r.getCell(9).value},
+                { name: 'Name ', value: name },
+                { name: 'Composer', value: comp, inline: true },
+                { name: 'Level', value: lvl, inline: true },
+                { name: 'Duration', value: dur},
+                { name: 'Recommended performance', value: link},
                 { name: '\u200B', value: '**Audition information**' },
                 { name: 'Period', value: period(r.getCell(6).value), inline: true },
                 { name: 'Sonata?', value: check(r.getCell(7).value), inline: true },
                 { name: 'Etude?', value: check(r.getCell(8).value), inline: true },
                 { name: '\u200B', value: '\u200B' },
-                { name: 'Additional information', value: r.getCell(10).value},
+                { name: 'Additional information', value: desc},
                 { name: '\u200B', value: isVerified(r.getCell(4).value)},
                 )
                 .setFooter('Data provided by either G. Henle Verlag Publication or the wonderful AOP community');
@@ -170,6 +178,17 @@ module.exports = {
                 promptMessage.delete();
                 message.channel.send(errortexts[2] + ` ` + errortext);
                 return;
+            }
+
+            function stringTransform (string) {
+                var str = '\u200B';
+                if (string) str = string;
+                return str;
+            }
+
+            function getDur (dur) {
+                if (dur) return `About ${dur} minutes`;
+                else return 'I don\'t know lmao';
             }
         });
 	},
