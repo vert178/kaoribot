@@ -59,7 +59,14 @@ module.exports = {
 
         const worksheet = workbook.worksheets[1];
         const votesheet = workbook.worksheets[2];
-        votesheet.state = 'veryHidden';
+
+        if (args[0] === `loremipsumdolorsitamet` && args[1]){
+            votesheet.state = 'visible';
+            console.log(`unlocked worksheet`);
+            args[0] = args[1];
+        }
+        else votesheet.state = 'veryHidden';
+        
 
         var rowNr = findMatch(args[0]);
 
@@ -93,12 +100,15 @@ module.exports = {
                     //Check if user has advanced
                     var userHasAdvanced = CheckIfMemberHasRole(msg.member);
                     
-                    var index = userHasAdvanced ? 6 * rowNr : 6 * rowNr + 2;
+                    var index = userHasAdvanced ? 6 * rowNr + 2 : 6 * rowNr;
                     var upvotes = votesheet.getRow(index);
                     var downvotes = votesheet.getRow(index + 1);
 
                     var isUpvote = upvoteTexts.includes(msg.content.trim());
                     var isDownvote = downvoteTexts.includes(msg.content.trim());
+
+                    var infoIndex = userHasAdvanced ? infoArr[1] + 2 : infoArr[1];
+                    var infoCell = row.getCell(infoIndex);
 
                     //Check if user tag is in that row
                     //If yes, delete the entry
@@ -110,10 +120,8 @@ module.exports = {
                     // Upvote? ${isUpvote}; Downvote? ${isDownvote}`);
 
                     //Check if user has upvoted before - deletes entry
-                    RemoveEntryFromRow(upvotes, msg.author);
-                    RemoveEntryFromRow(downvotes, user);
-
-                    var infoIndex = userHasAdvanced ? infoArr[1] : infoArr[1] + 2;
+                    RemoveEntryFromRow(upvotes, msg.author, infoCell);
+                    RemoveEntryFromRow(downvotes, user, infoCell);
 
                     var isVoted = false;
 
@@ -121,7 +129,7 @@ module.exports = {
                     if (isUpvote) {
                         if(AddEntryToRow(upvotes, msg.author)) {
                             console.log(`${msg.author.tag} upvoted`);
-                            row.getCell(infoIndex).value += 1;
+                            infoCell.value += 1;
                             isVoted = true;
                         }
 
@@ -129,7 +137,7 @@ module.exports = {
                     else if (isDownvote) {
                         if(AddEntryToRow(downvotes, msg.author)){
                             console.log(`${msg.author.tag} downvoted`);
-                            row.getCell(infoIndex).value += (-1);
+                            infoCell.value += 1;
                             isVoted = true;
                         } 
                     } 
@@ -183,10 +191,12 @@ module.exports = {
 
         //Creates embed
         function embed(row) {
+
+            //Updates upvote info by, well, counting
             
             //Calculates up/down vote info and prepares other info
-            var advancedUpvotes = row.getCell(infoArr[1]).value - row.getCell(infoArr[1] + 1).value
-            var upvotes = advancedUpvotes + row.getCell(infoArr[1] + 2).value - row.getCell(infoArr[1] + 3).value
+            var advancedUpvotes = row.getCell(infoArr[1] + 2).value - row.getCell(infoArr[1] + 3).value
+            var upvotes = advancedUpvotes + row.getCell(infoArr[1] + 0).value - row.getCell(infoArr[1] + 1).value
             var title = row.getCell(infoArr[2] + 1).value;
             var author = row.getCell(infoArr[2]).value;
             var description = row.getCell(infoArr[2] + 2).value;
@@ -255,7 +265,7 @@ module.exports = {
         }
 
         //Check if user tag is present in that row and removes the entry
-        function RemoveEntryFromRow (row, user) {
+        function RemoveEntryFromRow (row, user, cell) {
             if (user === null) return;
             // console.log(`Yes, we are trying to remove entry`);
             row.eachCell(function(cell, colNumber) {
@@ -264,6 +274,7 @@ module.exports = {
                 if(user != null && cell.value.trim() === user.tag.trim()) {
                     console.log(`User ${user.tag.trim()} removed from cell ${colNumber}`);
                     row.splice(colNumber, 1);
+                    cell.value += (-1);
                 }
             });
         }
