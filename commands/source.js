@@ -8,6 +8,7 @@ module.exports = {
     args: [`code`, `data`],
     example: `Kaori, source data`,
     cooldown: 5,
+    minArgs: 1,
 	execute(message, args) {
         switch (args[0].toLowerCase().trim())
         {

@@ -4,6 +4,7 @@ module.exports = {
 	name: 'good',
 	description: 'Why do you even care',
     hidden: true,
+    minArgs: 1,
 	execute(message, args) {
         if (!args[0]) return;
 

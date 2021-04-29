@@ -22,6 +22,7 @@ module.exports = {
     args: [`\"The name of the piece you wanna search\"`],
     example: `Kaori, search Chopin Waterfall Etude`,
     cooldown: 5,
+    minArgs: 1,
 	async execute(message, args) {
         
         //Only index the database if the workbook isnt already reloaded

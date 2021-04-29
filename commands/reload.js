@@ -5,19 +5,20 @@ module.exports = {
     alias: ['r'],
 	description: 'Why do you even care',
     hidden: true,
+    minArgs: 1,
 	execute(message, args) {
 		//Try to find command
-        if (!args.length) return message.channel.send(`Yes?`);
-            const commandName = args[0].toLowerCase();
-            const command = message.client.commands.get(commandName)
-	            || message.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+        const commandName = args[0].toLowerCase();
+        const command = message.client.commands.get(commandName)
+	        || message.client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
-            if (!command) return message.channel.send(`No thats not how it works`);
+        if (!command) return message.channel.send(`No thats not how it works`);
 
         //Delete the cache
         try{
             delete require.cache[require.resolve(`./${command.name}.js`)];
         }catch (error) {
+            //If cacheus deletus fails, mostly due to error in test code
             console.log(error);
             message.channel.send(`Wahh you just broke me :sob:`);
             return;

@@ -38,6 +38,7 @@ module.exports = {
     description: `Looks up info for bot-faq function. Still in development so it might not function correctly`,
     alias: [`answer`, `t`,],
     example: `Kaori, tell melody`,
+    minArgs: 1,
     cooldown: 5,
 	async execute(message, args) {
         //Only index the database if the workbook isnt already reloaded
@@ -53,19 +54,10 @@ module.exports = {
             }
         }
 
-        if (args[0] === null) {
-            return message.channel.send(`Please specify which piece you want me to tell!`);
-        }
-
         const worksheet = workbook.worksheets[1];
         const votesheet = workbook.worksheets[2];
 
-        if (args[0] === `loremipsumdolorsitamet` && args[1]){
-            votesheet.state = 'visible';
-            console.log(`unlocked worksheet`);
-            args[0] = args[1];
-        }
-        else votesheet.state = 'veryHidden';
+        votesheet.state = 'veryHidden';
         
 
         var rowNr = findMatch(args[0]);

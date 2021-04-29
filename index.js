@@ -37,8 +37,9 @@ client.on("message", message => {
     //Process validity of message, prefix, then argmuent
     if (message.author.bot) return;
 
-    var isPrefix = message.content.toLowerCase().startsWith(prefix);
+    if (message.content.toLowerCase().startsWith('hi kaori')) return message.channel.send('Hiya!');
 
+    var isPrefix = message.content.toLowerCase().startsWith(prefix);
     if (!isPrefix &&
         !message.content.toLowerCase().startsWith(prefix2)) return;
 
@@ -50,19 +51,20 @@ client.on("message", message => {
     const command = client.commands.get(commandName) 
     || client.commands.find(cmd => cmd.alias && cmd.alias.includes(commandName));
 
+    //Process command
     if (!command) return;
-
-    if (command.serverOnly && message.channel.type === 'dm') {
+    else if (command.serverOnly && message.channel.type === 'dm') 
         return message.reply('This is dms, and it\'s not exactly the best place to play with this command...');
-    }
+    else if (command.minArgs && args.length < command.minArgs) return message.channel.send(`Whoops that doesn't sound like a valid command`);
+    
 
     //Process cooldown
-    if (!cooldowns.has(command.name)) {
-        cooldowns.set(command.name, new Discord.Collection());
-    }
+    if (!cooldowns.has(command.name)) cooldowns.set(command.name, new Discord.Collection());
+    
     const now = Date.now();
     const timestamps = cooldowns.get(command.name);
     const cooldownAmount = (command.cooldown || 3) * 1000;
+
     if (timestamps.has(message.author.id)) {
         const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 
@@ -73,6 +75,7 @@ client.on("message", message => {
     }
     timestamps.set(message.author.id, now);
     setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
+
 
     //Execute
     try {

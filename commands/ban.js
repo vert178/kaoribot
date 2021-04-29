@@ -12,11 +12,7 @@ module.exports = {
 	async execute(message, args) {
 
         // A placeholder function that was made to be a joke originally
-
-
-
         
-
         // var isPermitted = CheckIfMemberHasRole(message.member);
 
         // if (!isPermitted) return message.channel.send('You are not staff don\'t try and ban people.');
@@ -38,17 +34,17 @@ module.exports = {
         // bannedWagon.send("<@" + bannedMember.id + "> THE STATE HAS ELECTED TO BEAN YOUR ASS");
 
 
-        // // try{
-        // //     return bannedWagon.send(`\@${name} **THE STATE HAS ELECTED TO BEAN YO ASS** :833354104657936395:`);
-        // // }
-        // // catch (error) {
-        // //     bannedWagon.delete();
-        // //     console.log(error);
-        // // }
+        // // // try{
+        // // //     return bannedWagon.send(`\@${name} **THE STATE HAS ELECTED TO BEAN YO ASS** :833354104657936395:`);
+        // // // }
+        // // // catch (error) {
+        // // //     bannedWagon.delete();
+        // // //     console.log(error);
+        // // // }
 
         
 
-        // //
+        // // //
 
         // console.log(`Bean time ${name}`);
 

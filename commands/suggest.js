@@ -43,6 +43,7 @@ module.exports = {
     args: [`audition`, "faq \`\`initiator\`\`"],
     example: `Kaori, suggest faq melody \n Kaori, suggest audition`,
     cooldown: 5,
+    minArgs: 1,
 	async execute(message, args) {
 
         // return message.channel.send(`This function is under construction! Come back later`);
