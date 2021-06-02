@@ -52,8 +52,6 @@ module.exports = {
                 return message.channel.send("Whoops that's not a valid command!");
         }
 
-        console.log(arr);
-
         var str = '';
 
         for (i=0; i < howMany; i++)
