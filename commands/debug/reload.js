@@ -7,6 +7,7 @@ module.exports = {
     hidden: true,
     minArgs: 1,
 	execute(message, args) {
+        
 		//Try to find command
         const commandName = args[0].toLowerCase();
         const command = message.client.commands.get(commandName)
@@ -14,9 +15,12 @@ module.exports = {
 
         if (!command) return message.channel.send(`No thats not how it works`);
 
+        const commandFolders = fs.readdirSync('./commands');
+        const folderName = commandFolders.find(folder => fs.readdirSync(`./commands/${folder}`).includes(`${command.name}.js`));
+
         //Delete the cache
         try{
-            delete require.cache[require.resolve(`./${command.name}.js`)];
+            delete require.cache[require.resolve(`../${folderName}/${command.name}.js`)];
         }catch (error) {
             //If cacheus deletus fails, mostly due to error in test code
             console.log(error);
@@ -26,7 +30,7 @@ module.exports = {
 
         //Reloads command
         try {
-            const newCommand = require(`./${command.name}.js`);
+            const newCommand = require(`../${folderName}/${command.name}.js`);
             message.client.commands.set(newCommand.name, newCommand);
         } catch (error) {
             console.error(error);

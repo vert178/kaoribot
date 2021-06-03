@@ -1,8 +1,8 @@
 const Discord = require('discord.js');
 const Excel = require('exceljs');
 const fs = require('fs');
-const filename = (`data.xlsx`)
-const workbook = new Excel.Workbook(); 
+const ExcelUtility = require(`./../utilities/excelutility.js`);
+const filename = (`data.xlsx`);
 
 const errortexts = ["Hmmm something strange happened maybe try again. :frowning:",
 "It says here you have too few entries and you are trying to finalize the result. Probably something went wrong :frowning:",
@@ -19,8 +19,9 @@ const promptText = ["Are you sure you want to suggest an entry for ",
 
 const auditionPrompt = ["Oki let's start then. Please type in the name for your piece (without the composer)",
 "Please enter the composer of your piece",
-"Please suggest a level for your piece. Enter a number between 1-9, or if you think its off the charts, enter 9\+",
-"Do you know how long the piece will probably take for one to perform? (in minutes)",
+"Please suggest a level for your piece. Enter a number between 1-9, or if you think it's too hard that it's off the charts, enter 9\+",
+"Which period is the piece composed in? Enter 1 for baroque era, 2 for classical era, 3 for romantic era and 4 for post romantic. If you don't know, enter 0.",
+"How long does a typical performance of this piece takes? (in minutes)",
 "Please add some description for your piece. Enter \"skip\" if you have none",
 "Do you have a youtube link of someone performing the piece? If yes, put it here. If there is none, enter \"skip\"",
 ];
@@ -46,32 +47,13 @@ module.exports = {
     minArgs: 1,
 	async execute(message, args) {
 
-        // return message.channel.send(`This function is under construction! Come back later`);
-        
-        //Index everytime i dont care anymore
-        if(!workbook.creator || true)
-        {
-            try{
-                await workbook.xlsx.readFile(filename);
-            }
-            catch(error){
-                console.log(error);
-                message.channel.send(errortexts[0] + ` ` + errortext);
-                return;
-            }
-        }
-
+        const workbook = await ExcelUtility.loadExcel(true);
         const auditionWorksheet = workbook.worksheets[0];
         const faqWorksheet = workbook.worksheets[1];
 
         //Sets up filter and reacts to the message
-        var emojiFilter = (reaction, user) => {
-            return emojis.includes(reaction.emoji.name) && user.id === message.author.id;
-        };
-                
-        var messageFilter = (msg) => {
-            return msg.author.id === message.author.id;
-        };
+        var emojiFilter = (reaction, user) => { return emojis.includes(reaction.emoji.name) && user.id === message.author.id; };     
+        var messageFilter = (msg) => { return msg.author.id === message.author.id; };
 
         var arg = args[0].toLowerCase().trim();
 
@@ -83,14 +65,14 @@ module.exports = {
         {
             prompt = `audition`;
             promptTextArray = auditionPrompt;
-            minEntry = 3;
+            minEntry = 4;
         }
         else if (arg === `faq` && args.length > 1)
         {
             var hasMatch = findMatch(faqWorksheet, args[1]);
             // console.log("Can found match = " + hasMatch);
             if (hasMatch) {
-                console.log(`Found exact match on row ${i} for entry ${args[1]} by ${message.author.tag}`);
+                console.log(`Found exact match of ID ${i} for entry ${args[1]} by ${message.author.tag}`);
                 return message.channel.send(`I found an exact match of the entry you are trying to make! Try saying \" Kaori, tell ${args[1]}\"`);
             }
             
@@ -101,12 +83,14 @@ module.exports = {
 
         if(minEntry < 0) return message.channel.send(errortexts[3]);
 
+        //Valid initiator, lets start collecting stuff
+
         message.channel.send(promptText[0] + prompt + promptText[1]).then(async msg => {
                 
             var msgCollector = msg.createReactionCollector(emojiFilter, {
                 max: 1,
-                time: 15000,
-                idle: 15000
+                time: 20000,
+                idle: 20000
             });
 
             //Collects reaction for confirmation
@@ -129,7 +113,7 @@ module.exports = {
 
                 var data = [];
 
-                entryCollector.on('collect', (entry, user) => {
+                entryCollector.on('collect', entry => {
                     //Have ways to end prematurely. Aborts everything
                     if (entry.content.toLowerCase() === `end`) {
                         msg.channel.send(promptText[2]);
@@ -137,23 +121,18 @@ module.exports = {
                         return;
                     }
 
-                    var shouldSkip = data.length >= minEntry && entry.content.toLowerCase().trim() === `skip`;
-                    // console.log(` ${data.length} , ${minEntry}, ${entry.content}, ${shouldSkip}`);
-
-                    if (shouldSkip) {
+                    //If the user decides to skip the rest of the entry
+                    if (data.length >= minEntry && entry.content.toLowerCase().trim() === `skip`) {
                             entryCollector.stop('user end');
-                    } else 
+                    } 
+                    else 
                     {
                         data.push(entry.content);
 
                         //Now if we are at the 5th entry then data entry will equal 5
                         //Check for explode
-                        if (data.length >= promptTextArray.length) {
-                            entryCollector.stop('user end');
-                        }
-                        else {
-                            entry.channel.send(`${promptTextArray[data.length]}`);
-                        }
+                        if (data.length >= promptTextArray.length) entryCollector.stop('user end');
+                        else entry.channel.send(`${promptTextArray[data.length]}`);
                     }
                 });
 
@@ -276,7 +255,8 @@ module.exports = {
             var name = data[0];
             var composer = data[1];
             var level = data[2];
-            var duration = data[3];
+            var duration = data[4];
+            var period = piecePeriod(data[3]); 
             var desc = '\u200b';
             if (data.length > 4) desc = data[4];
             var link = '\u200b';
@@ -292,6 +272,7 @@ module.exports = {
                 { name: 'Composer', value: composer, inline: true },
                 { name: 'Level', value: level, inline: true },
                 { name: 'Duration', value: `About ${duration} minutes`},
+                { name: 'Period', value: period},
                 { name: 'Recommended performance', value: link},
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Additional information', value: desc},
@@ -324,7 +305,7 @@ module.exports = {
             var link = '';
             if (data.length > 5) desc = data[5];
 
-            buffer.push(data[0], data[1], data[2], false, data[3], -1, false, false, link, desc);
+            buffer.push(data[0], data[1], data[2], false, data[4], data[3], false, false, link, desc);
 
             console.log(buffer);
 
@@ -344,7 +325,8 @@ module.exports = {
         async function storeFaqData(arg, data, minEntry) {
             
             var buffer = [];
-            buffer.push(arg,0,0,0,0,message.author.tag,data[0], data[1],data.length - minEntry);
+            var id = 1;
+            buffer.push(arg,id,0,0,0,0,message.author.tag,data[0], data[1], data.length - minEntry);
             var merged = buffer.concat(data.splice(0, minEntry));
 
             console.log(buffer);
@@ -358,6 +340,21 @@ module.exports = {
                 console.log(error);
                 message.channel.send(errortexts[0] + ` ` + errortext);
                 return false;
+            }
+        }
+
+        function piecePeriod(value) {
+            switch (value) {
+            case 1:
+                return 'Baroque period';
+            case 2:
+                return 'Classical period';
+            case 3:
+                return 'Romantic period';
+            case 4:
+                return 'Modern / 20th Century';
+            default:
+                return `N/A`;
             }
         }
 	},

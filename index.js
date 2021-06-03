@@ -5,7 +5,6 @@ const fs = require('fs');
 //Create new client
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith( `.js`));
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
 //Token and stuff
@@ -24,9 +23,14 @@ for (const file of eventFiles) {
 
 
 //Set up commands
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command);
+const commandFolders = fs.readdirSync('./commands');
+
+for (const folder of commandFolders) {
+	const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
+	for (const file of commandFiles) {
+		const command = require(`./commands/${folder}/${file}`);
+		client.commands.set(command.name, command);
+	}
 }
 
 client.login(token);
@@ -34,15 +38,17 @@ client.login(token);
 //Reply to message
 client.on("message", message => {
 
-    //Process validity of message, prefix, then argmuent
+    //Process validity of message
     if (message.author.bot) return;
 
     if (message.content.toLowerCase().startsWith('hi kaori')) return message.channel.send('Hiya!');
 
+    //Proceess prefix
     var isPrefix = message.content.toLowerCase().startsWith(prefix);
     if (!isPrefix &&
         !message.content.toLowerCase().startsWith(prefix2)) return;
 
+    //Process arguments
     const commandBody = isPrefix ? message.content.slice(prefix.length) : message.content.slice(prefix2.length);
     const args = commandBody.trim().split(/ +/);
     const commandName = args.shift().toLowerCase();
@@ -55,7 +61,8 @@ client.on("message", message => {
     if (!command) return;
     else if (command.serverOnly && message.channel.type === 'dm') 
         return message.reply('This is dms, and it\'s not exactly the best place to play with this command...');
-    else if (command.minArgs && args.length < command.minArgs) return message.channel.send(`Whoops that doesn't sound like a valid command`);
+    else if (command.minArgs && args.length < command.minArgs) 
+        return message.channel.send(`Whoops that doesn't sound like a valid command`);
     
 
     //Process cooldown
