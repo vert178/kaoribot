@@ -24,6 +24,7 @@ yarn-error.log*
 
 #custom
 data.xlsx
+~data.xlsx
 template.xlsx
 config.json
 /resources
