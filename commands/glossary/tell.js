@@ -4,9 +4,8 @@ const fs = require('fs');
 const ExcelUtility = require(`./../utilities/excelutility.js`);
 const filename = (`data.xlsx`);
 
-//In order: initiator, upvotesInfo ,title
-//title, author, description, links should always go together and located at the rightmost columns
-const infoArr = [1, 2, 6,];
+//In order: initiator, id, voteinfo, author, title, description, links, force verify
+const infoArr = [7, 6, 1, 8, 9, 10, 12, 5];
 
 const texts = ["I can't find a match for your query :frowning: maybe try again\? You can also say \"Kaori, suggest",
 "\" to make a new entry!",
@@ -49,10 +48,10 @@ module.exports = {
             var row = worksheet.getRow(rowNr);
 
             //Sends the embed
-            message.channel.send(ExcelUtility.createGlossaryEmbed(row.getCell(1).value,
-            [row.getCell(3).value, row.getCell(4).value, row.getCell(5).value, row.getCell(6).value],
-            row.getCell(8),row.getCell(7),row.getCell(9),
-            [row.getCell(11),row.getCell(12),row.getCell(13)])).then(async result => {
+            message.channel.send(ExcelUtility.createGlossaryEmbed(row.getCell(infoArr[0]).value,
+            [row.getCell(infoArr[2]).value, row.getCell(infoArr[2]+1).value, row.getCell(infoArr[2]+2).value, row.getCell(infoArr[2]+3).value],
+            row.getCell(infoArr[4]),row.getCell(infoArr[3]),row.getCell(infoArr[5]),
+            [row.getCell(infoArr[6]),row.getCell(infoArr[6]+1),row.getCell(infoArr[6]+2)])).then(async result => {
                 
                 //If this is happening in dms, gtfo before kaori realises advanced roles is not a thing in dms
                 if (message.channel.type === 'dm') return;
@@ -72,10 +71,10 @@ module.exports = {
                     //If its neither an upvote nor a downvote then Kaori can sleeep 
                     if (isDownvote || isUpvote) {
                         var isAdv = CheckIfMemberHasRole(msg.member);
-                        var upvotes = votesheet.getRow(isAdv ? 6 * row.getCell(2).value + 3 : 6 * row.getCell(2).value + 1);
-                        var downvotes = votesheet.getRow(isAdv ? 6 * row.getCell(2).value + 4 : 6 * row.getCell(2).value + 2);
-                        var upCount = row.getCell(isAdv ? 5 : 3);
-                        var downCount = row.getCell(isAdv ? 6 : 4);
+                        var upvotes = votesheet.getRow(isAdv ? 6 * row.getCell(infoArr[1]).value + 3 : 6 * row.getCell(infoArr[1]).value + 1);
+                        var downvotes = votesheet.getRow(isAdv ? 6 * row.getCell(infoArr[1]).value + 4 : 6 * row.getCell(infoArr[1]).value + 2);
+                        var upCount = row.getCell(infoArr[2] + (isAdv ? 2 : 0));
+                        var upCount = row.getCell(infoArr[2] + (isAdv ? 3 : 1));
 
                         if(RemoveEntryFromRow(upvotes, msg.author)) upCount.value += (-1);
                         if (RemoveEntryFromRow(downvotes, msg.author)) downCount.value += (-1);
@@ -85,7 +84,7 @@ module.exports = {
                         //Process vote
                         if (isUpvote) {
                             if(AddEntryToRow(upvotes, msg.author)) {
-                                console.log(`${msg.author.tag} upvoted the entry ${row.getCell(1).value}`);
+                                console.log(`${msg.author.tag} upvoted the entry ${row.getCell(infoArr[0]).value}`);
                                 upCount.value += 1;
                                 isVoted = true;
                             }
@@ -93,7 +92,7 @@ module.exports = {
                         }
                         else if (isDownvote) {
                             if(AddEntryToRow(downvotes, msg.author)){
-                                console.log(`${msg.author.tag} downvoted the entry ${row.getCell(1).value}`);
+                                console.log(`${msg.author.tag} downvoted the entry ${row.getCell(infoArr[0]).value}`);
                                 downCount.value += 1;
                                 isVoted = true;
                             } 
@@ -128,7 +127,7 @@ module.exports = {
         function findMatch(arg) {
             for (i=2; i <= worksheet.actualRowCount; i++){
                 //Process string
-                var toCompare = worksheet.getRow(i).getCell(1).value.toLowerCase().trim();
+                var toCompare = worksheet.getRow(i).getCell(infoArr[0]).value.toLowerCase().trim();
                 var arg = arg.toLowerCase().trim();
                 if(toCompare === arg) return i;
             }
