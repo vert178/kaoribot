@@ -8,6 +8,9 @@ const Constants = require(`./constants.js`);
 
 module.exports = {
 
+    hidden: true,
+    isUtility: true,
+
     async loadExcel (reload) {
         if(reload)
         {
@@ -104,22 +107,6 @@ module.exports = {
         )
         .setFooter(footer);
     },
-
-    // storeFaqData(initiator, author, title, description, links) {
-    //     var data = [];
-    //     //id = Look for next available id
-    //     data[Constants.infoArr[0]] = initiator;
-    //     data[Constants.infoArr[1]] = id;
-    //     data[Constants.infoArr[2]] = author;
-    //     data[Constants.infoArr[3]] = title;
-    //     data[Constants.infoArr[4]] = description;
-
-    //     for (i=0; i < links.length; i++) {
-    //         data[Constants.infoArr[5 + i]] = links[i];
-    //     }
-        
-    //     return data;
-    // }
 };
 
 function countNonEmpty (row, sheet) {

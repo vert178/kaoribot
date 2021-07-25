@@ -1,11 +1,9 @@
-const fs = require('fs');
-
 module.exports = {
 	name: 'good',
 	description: 'Why do you even care',
     hidden: true,
     minArgs: 1,
-	execute(message, args) {
+	execute(message, args, Constants, ExcelUtility, Utility) {
         if (!args[0]) return;
 
         var arg = args[0].toLowerCase().trim();

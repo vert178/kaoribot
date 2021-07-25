@@ -1,6 +1,9 @@
 //Require Discord js
 const Discord = require('discord.js');
 const fs = require('fs');
+const Constants = require(`./commands/utilities/constants.js`);
+const ExcelUtility = require(`./commands/utilities/excelutility.js`);
+const Utility = require(`./commands/utilities/utility.js`);
 
 //Create new client
 const client = new Discord.Client();
@@ -40,13 +43,11 @@ client.on("message", message => {
 
     //Process validity of message
     if (message.author.bot) return;
-
     if (message.content.toLowerCase().startsWith('hi kaori')) return message.channel.send('Hiya!');
 
     //Proceess prefix
     var isPrefix = message.content.toLowerCase().startsWith(prefix);
-    if (!isPrefix &&
-        !message.content.toLowerCase().startsWith(prefix2)) return;
+    if (!isPrefix && !message.content.toLowerCase().startsWith(prefix2)) return;
 
     //Process arguments
     const commandBody = isPrefix ? message.content.slice(prefix.length) : message.content.slice(prefix2.length);
@@ -54,15 +55,13 @@ client.on("message", message => {
     const commandName = args.shift().toLowerCase();
 
     //Process aliases
-    const command = client.commands.get(commandName) 
-    || client.commands.find(cmd => cmd.alias && cmd.alias.includes(commandName));
+    const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.alias && cmd.alias.includes(commandName));
 
     //Process command
-    if (!command) return;
-    else if (command.serverOnly && message.channel.type === 'dm') 
-        return message.reply('This is dms, and it\'s not exactly the best place to play with this command...');
-    else if (command.minArgs && args.length < command.minArgs) 
-        return message.channel.send(`Whoops that doesn't sound like a valid command`);
+    if (!command || command.isUtility) return;
+    if (command.restricted && !Utility.CheckIfArrayContains([message.author.id], Constants.permittedID))    
+    if (command.serverOnly && message.channel.type === 'dm') return message.reply('This is dms, and it\'s not exactly the best place to play with this command...');   
+    if (command.minArgs && args.length < command.minArgs) return message.channel.send(`Whoops that doesn't sound like a valid command`);
     
 
     //Process cooldown
@@ -86,7 +85,7 @@ client.on("message", message => {
 
     //Execute
     try {
-        command.execute(message, args);
+        command.execute(message, args, Constants, ExcelUtility, Utility);
     } catch (error) {
         console.error(error);
         message.channel.send(`Something went wrong! \n ${error}`);

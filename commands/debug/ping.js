@@ -4,7 +4,7 @@ module.exports = {
     alias: [`test`, `wake`],
     example: `Kaori, ping`,
     cooldown: 1,
-	execute(message, args) {
+	execute(message, args, Constants, ExcelUtility, Utility) {
         const latency = Date.now() - message.createdTimestamp;
 
         if (args.length > 0 && args[0] === "debug") {

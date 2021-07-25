@@ -29,7 +29,7 @@ module.exports = {
     example: `Kaori, tell piano`,
     minArgs: 1,
     cooldown: 5,
-	async execute(message, args) {
+	async execute(message, args, Constants, ExcelUtility, Utility) {
         const workbook = await ExcelUtility.loadExcel(true);
         const worksheet = workbook.worksheets[1];
         const votesheet = workbook.worksheets[2];

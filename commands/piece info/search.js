@@ -1,7 +1,4 @@
 const AccurateSearch = require('accurate-search');
-const Constants = require(`../utilities/constants.js`);
-const ExcelUtility = require(`./../utilities/excelutility.js`);
-const Utility = require(`./../utilities/utility.js`);
 
 const maxResultsPushed = 5;
 
@@ -19,7 +16,7 @@ module.exports = {
     example: `Kaori, search Chopin Waterfall Etude`,
     cooldown: 5,
     minArgs: 1,
-	async execute(message, args) {
+	async execute(message, args, Constants, ExcelUtility, Utility) {
         
         const workbook = await ExcelUtility.loadExcel(true);
         const worksheet = workbook.worksheets[0];

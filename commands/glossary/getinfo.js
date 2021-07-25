@@ -1,15 +1,10 @@
-const ExcelUtility = require(`./../utilities/excelutility.js`);
-const Utility = require(`../utilities/utility.js`);
-const Constants = require(`../utilities/constants.js`);
-
 module.exports = {
 	name: 'getinfo',
 	description: 'Why do you even care',
     hidden: true,
     serverOnly: true,
-	async execute(message, args) {
-		if (!Utility.CheckIfArrayContains([message.author.id], Constants.permittedID)) 
-			return console.log(`${message.author.tag} is trying to get info for ${args[0]} and they are denied`);
+	restricted: true,
+	async execute(message, args, Constants, ExcelUtility, Utility) {
 
 		const workbook = await ExcelUtility.loadExcel(true);
 		const worksheet = workbook.worksheets[1];

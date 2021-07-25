@@ -1,21 +1,20 @@
-const suspiciousNames = ["twitter.com", "h0nde",];
+const Constants = require(`./../commands/utilities/constants.js`);
+const ExcelUtility = require(`./../commands/utilities/excelutility.js`);
+const Utility = require(`./../commands/utilities/utility.js`);
+
+const ContainAtLeast = 2;
+
 module.exports = {
-	name: 'guildMemberAdd',
-	once: false,
-	async execute(member, client) {
+    name: 'guildMemberAdd',
+    once: false,
+    async execute(member, client) {
+        var suspiciousNames = Constants.suspiciousNames;
         var name = member.user.username.toLowerCase();
-        if (name.includes(suspiciousNames[0]) && name.includes(suspiciousNames[1]))
-        {
-            await sleep(3000);
-            member.ban({ days: 7, reason: 'bot spam scam' })
+        if (Utility.StringContainAtLeast(name, suspiciousNames, ContainAtLeast)){
+            await Utility.sleep(3000);
+            member.ban({ days: 7, reason: 'possible bot spam scam' })
                 .then(console.log(`banned ${name} from ${member.guild.name}`))
                 .catch(console.error);
         }
-
-        function sleep(ms) {
-            return new Promise((resolve) => {
-              setTimeout(resolve, ms);
-            });
-          }
-	},
+    },
 };

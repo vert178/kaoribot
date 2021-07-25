@@ -1,7 +1,5 @@
 const {Discord, Attachment, MessageAttachment} = require('discord.js');
 const link = `https://github.com/vert178/kaoribot`;
-const ExcelUtility = require(`./../utilities/excelutility.js`);
-
 module.exports = {
     name: `source`,
     description: `Gives you a link to my source code or the data . `,
@@ -9,7 +7,7 @@ module.exports = {
     example: `Kaori, source data`,
     cooldown: 5,
     minArgs: 1,
-	async execute(message, args) {
+	async execute(message, args, Constants, ExcelUtility, Utility) {
 
         const workbook = await ExcelUtility.loadExcel(true);
 

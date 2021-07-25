@@ -5,7 +5,7 @@ module.exports = {
     alias: [`commands`],
     example: `Kaori, help`,
     cooldown: 1,
-	execute(message, args) {
+	execute(message, args, Constants, ExcelUtility, Utility) {
         const data = [];
         const { commands } = message.client;
         const filteredCommands = commands.filter(function( command ) {

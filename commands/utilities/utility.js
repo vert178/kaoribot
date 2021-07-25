@@ -1,4 +1,7 @@
-module.exports = { name : "utility",
+module.exports = {
+
+    hidden: true,
+    isUtility: true,
     
     //Add an empty character to a string if its empty
     stringTransform (string) {
@@ -39,7 +42,21 @@ module.exports = { name : "utility",
             searchString += ' ';
         }
         return searchString;
-    }
+    },
+
+    sleep(ms) {
+        return new Promise((resolve) => {
+          setTimeout(resolve, ms);
+        });
+    },
+
+    StringContainAtLeast(string, checklist, n) {
+        var z = 0;
+        for (i=0; i < checklist.length; i++) {
+            if (string.includes(checklist[i])) z+=1;
+        }
+        return z;
+    },
 };
 
 function isEmpty(value) {
