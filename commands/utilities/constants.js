@@ -11,5 +11,6 @@ module.exports = {
     infoArr: [2, 1, 3, 4, 5, 7],
     emojis: ["🗑️", "1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣"],
 
-    suspiciousNames : ["twitter.com", "h0nde", "discordgate", "hashtag"],
+    suspiciousNames : ["twitter.com", "h0nde", "discordgate", "hashtag",
+"EonChange", "Agent[", "OnXCoins", "Potrexbit"],
 }
