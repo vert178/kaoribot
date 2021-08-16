@@ -53,7 +53,7 @@ module.exports = {
     StringContainAtLeast(string, checklist, n) {
         var z = 0;
         for (i=0; i < checklist.length; i++) {
-            if (string.includes(checklist[i])) z+=1;
+            if (string.trim().toLowerCase().includes(checklist[i].trim().toLowerCase())) z+=1;
         }
         return z;
     },
