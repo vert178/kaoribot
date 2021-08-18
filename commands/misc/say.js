@@ -2,9 +2,9 @@ module.exports = {
 	name: 'say',
 	description: 'Why do you even care',
     hidden: true,
-    serverOnly: true,
     restricted: true,
-	async execute(message, args, Constants, ExcelUtility, Utility) {
+    alias: ["echo", ],
+	async execute(message, args, Utility) {
         message.channel.send(Utility.RemergeArgs(args));
 	},
 };

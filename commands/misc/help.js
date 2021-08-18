@@ -5,19 +5,20 @@ module.exports = {
     alias: [`commands`],
     example: `Kaori, help`,
     cooldown: 1,
-	execute(message, args, Constants, ExcelUtility, Utility) {
-        const data = [];
+	execute(message, args, Utility) {
+        var data = '\u200B';
         const { commands } = message.client;
         const filteredCommands = commands.filter(function( command ) {
             return !command.hidden;
         });
         
         if (!args.length) {
-            data.push(`\n Use the prefix \"${prefix}\" before a command. `);
-            data.push(`\n Alternatively, you can use \"${prefix2}\" if you'd prefer a shorter prefix`);
-            data.push('\n\n Anyway here\'s a list of stuff that I can do:');
-            data.push(filteredCommands.map(command => command.name).join(', '));
-            data.push(`\nAsk again with \`${prefix}help [command name]\` if you want more info`);
+            data += `Use the prefix \"${prefix}\" before a command. \n`;
+            data += `\n Alternatively, you can use \"${prefix2}\" if you'd prefer a shorter prefix \n`;
+            data += `======================================================== \n`;
+            data += '\n Anyway here\'s a list of stuff that I can do: ';
+            data += filteredCommands.map(command => command.name).join(', ');
+            data += `\n Ask again with \`${prefix}help [command name]\` if you want more info`;
 
             return message.author.send(data, { split: true })
 	            .then(() => {
@@ -39,11 +40,10 @@ module.exports = {
 
         data.push(`**Name:** ${command.name}`);
 
-        if (command.alias) data.push(`**Aliases:** ${command.alias.join(', ')}`);
-        if (command.args) data.push(`**Arguments:** ${command.args.join(', ')}`);
-        if (command.description) data.push(`**Description:** ${command.description}`);
-        if (command.example) data.push(`**Example:** ${command.example}`);
-        data.push(`**Cooldown:** ${command.cooldown || 3} second(s)`);
+        if (command.alias) data += `**Aliases:** ${command.alias.join(', ')}`;
+        if (command.args) data += `**Arguments:** ${command.args.join(', ')}`;
+        if (command.description) data += `**Description:** ${command.description}`;
+        if (command.example) data += `**Example:** ${command.example}`;
 
         message.channel.send(data, { split: true });
 	},

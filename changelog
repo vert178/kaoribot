@@ -1,0 +1,17 @@
+Ver 2.0 Updates:
+- Quick update to convert everything to be compatible with DiscordAPI v13.0
+- Reorganized code structure
+- 100% event based folder structure
+- Removed slash command component
+- Tell function add buttons and menus
+- Added debug log
+- Search function add buttons and menus
+
+To be added:
+Major:
+- Moderation functions
+- Role Restrictions
+- Search function advanced verification
+
+Minor:
+Change role to yellow whenever she joins a server

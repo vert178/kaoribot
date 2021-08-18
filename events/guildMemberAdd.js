@@ -1,13 +1,9 @@
-const Constants = require(`./../commands/utilities/constants.js`);
-const ExcelUtility = require(`./../commands/utilities/excelutility.js`);
-const Utility = require(`./../commands/utilities/utility.js`);
-
 const ContainAtLeast = 2;
 
 module.exports = {
     name: 'guildMemberAdd',
     once: false,
-    async execute(member, client) {
+    async execute(member, client, Utility) {
         var suspiciousNames = Constants.suspiciousNames;
         var name = member.user.username.toLowerCase();
         if (Utility.StringContainAtLeast(name, suspiciousNames, ContainAtLeast)){

@@ -1,5 +1,4 @@
 const fs = require('fs');
-const Discord = require('discord.js');
 
 const notes = ["C", "C#","D", "D#","E", "F", "F#","G", "Ab","A", "Bb", "B"];
 
@@ -15,11 +14,11 @@ const coin = ["Heads", "Tails"];
 module.exports = {
 	name: 'name',
     alias: ['choose'],
-	description: 'She will give you a random key, or a few random notes or whatever',
+	description: 'She will give you a random key, or a few random notes or whatever. Just a funny little command with basically no use.',
     example: `Kaori, name 3 notes`,
     args: ['notes', 'keys'],
     minArgs: 1,
-	async execute(message, args, Constants, ExcelUtility, Utility) {
+	async execute(message, args, Utility) {
 
         var howMany = 0;
 
@@ -43,6 +42,7 @@ module.exports = {
 
             case 'headsortails':
             case 'hot':
+            case 'coin':
                 arr = coin;
                 break;
 

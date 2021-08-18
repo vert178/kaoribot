@@ -3,8 +3,8 @@ module.exports = {
     description: `Attempts to ping me, just to check if I have arrived`,
     alias: [`test`, `wake`],
     example: `Kaori, ping`,
-    cooldown: 1,
-	execute(message, args, Constants, ExcelUtility, Utility) {
+    cooldown: 10,
+	execute(message, args, Utility) {
         const latency = Date.now() - message.createdTimestamp;
 
         if (args.length > 0 && args[0] === "debug") {

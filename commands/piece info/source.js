@@ -1,4 +1,4 @@
-const {Discord, Attachment, MessageAttachment} = require('discord.js');
+const {MessageAttachment} = require('discord.js');
 const link = `https://github.com/vert178/kaoribot`;
 module.exports = {
     name: `source`,
@@ -7,9 +7,9 @@ module.exports = {
     example: `Kaori, source data`,
     cooldown: 5,
     minArgs: 1,
-	async execute(message, args, Constants, ExcelUtility, Utility) {
+	async execute(message, args, Utility) {
 
-        const workbook = await ExcelUtility.loadExcel(true);
+        const workbook = await Utility.loadExcel(true);
 
         const votesheet = workbook.worksheets[2];
 

@@ -1,93 +1,20 @@
-//Require Discord js
-const Discord = require('discord.js');
 const fs = require('fs');
-const Constants = require(`./commands/utilities/constants.js`);
-const ExcelUtility = require(`./commands/utilities/excelutility.js`);
 const Utility = require(`./commands/utilities/utility.js`);
 
-//Create new client
-const client = new Discord.Client();
-client.commands = new Discord.Collection();
+const { Client, Collection, Intents } = require('discord.js');
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+
 const eventFiles = fs.readdirSync('./events').filter(file => file.endsWith('.js'));
 
-//Token and stuff
-const { prefix, prefix2, token } = require('./config.json');
-const cooldowns = new Discord.Collection();
-
-//Events
 for (const file of eventFiles) {
 	const event = require(`./events/${file}`);
 	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args, client));
+		client.once(event.name, (...args) => event.execute(...args, client, Utility));
 	} else {
-		client.on(event.name, (...args) => event.execute(...args, client));
+		client.on(event.name, (...args) => event.execute(...args, client, Utility));
 	}
 }
 
-
-//Set up commands
-const commandFolders = fs.readdirSync('./commands');
-
-for (const folder of commandFolders) {
-	const commandFiles = fs.readdirSync(`./commands/${folder}`).filter(file => file.endsWith('.js'));
-	for (const file of commandFiles) {
-		const command = require(`./commands/${folder}/${file}`);
-		client.commands.set(command.name, command);
-	}
-}
-
+//Token and stuff
+const { token } = require('./config.json');
 client.login(token);
-
-//Reply to message
-client.on("message", message => {
-
-    //Process validity of message
-    if (message.author.bot) return;
-    if (message.content.toLowerCase().startsWith('hi kaori')) return message.channel.send('Hiya!');
-
-    //Proceess prefix
-    var isPrefix = message.content.toLowerCase().startsWith(prefix);
-    if (!isPrefix && !message.content.toLowerCase().startsWith(prefix2)) return;
-
-    //Process arguments
-    const commandBody = isPrefix ? message.content.slice(prefix.length) : message.content.slice(prefix2.length);
-    const args = commandBody.trim().split(/ +/);
-    const commandName = args.shift().toLowerCase();
-
-    //Process aliases
-    const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.alias && cmd.alias.includes(commandName));
-
-    //Process command
-    if (!command || command.isUtility) return;
-    if (command.restricted && !Utility.CheckIfArrayContains([message.author.id], Constants.permittedID))    
-    if (command.serverOnly && message.channel.type === 'dm') return message.reply('This is dms, and it\'s not exactly the best place to play with this command...');   
-    if (command.minArgs && args.length < command.minArgs) return message.channel.send(`Whoops that doesn't sound like a valid command`);
-    
-
-    //Process cooldown
-    if (!cooldowns.has(command.name)) cooldowns.set(command.name, new Discord.Collection());
-    
-    const now = Date.now();
-    const timestamps = cooldowns.get(command.name);
-    const cooldownAmount = (command.cooldown || 3) * 1000;
-
-    if (timestamps.has(message.author.id)) {
-        const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-
-        if (now < expirationTime) {
-            const timeLeft = (expirationTime - now) / 1000;
-            return message.reply(`Wait ${timeLeft.toFixed(0)} more seconds before asking I need some rest.`);
-        }
-    }
-    timestamps.set(message.author.id, now);
-    setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-
-
-    //Execute
-    try {
-        command.execute(message, args, Constants, ExcelUtility, Utility);
-    } catch (error) {
-        console.error(error);
-        message.channel.send(`Something went wrong! \n ${error}`);
-    }
-});

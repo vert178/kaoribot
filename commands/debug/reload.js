@@ -6,7 +6,7 @@ module.exports = {
 	description: 'Why do you even care',
     hidden: true,
     minArgs: 1,
-	execute(message, args, Constants, ExcelUtility, Utility) {
+	execute(message, args, Utility) {
         
 		//Try to find command
         const commandName = args[0].toLowerCase();

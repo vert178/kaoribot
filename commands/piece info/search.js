@@ -1,4 +1,5 @@
 const AccurateSearch = require('accurate-search');
+const { MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } = require('discord.js');
 
 const maxResultsPushed = 5;
 
@@ -8,6 +9,9 @@ var errortexts = ["I can't locate the database for some reason :frowning:",
 
 var errortext = "\ \ Please tell vert if this problem persists";
 
+//In order: Name, Composer, Level, Length, Link, Description, Period, Sonata, Etude, Review
+const { searchArr } = require(`./../../config.json`);
+
 module.exports = {
     name: `search`,
     description: `Checks the info of a piece`,
@@ -16,9 +20,9 @@ module.exports = {
     example: `Kaori, search Chopin Waterfall Etude`,
     cooldown: 5,
     minArgs: 1,
-	async execute(message, args, Constants, ExcelUtility, Utility) {
+	async execute(message, args, Utility) {
         
-        const workbook = await ExcelUtility.loadExcel(true);
+        const workbook = await Utility.loadExcel(true);
         const worksheet = workbook.worksheets[0];
 
         var searchString = Utility.RemergeArgs(args);
@@ -28,8 +32,8 @@ module.exports = {
 
         //Index database
         worksheet.eachRow(function(row, rowNumber) {
-            var composer = row.getCell(2);
-            var pieceName = row.getCell(1);
+            var composer = row.getCell(searchArr[1]);
+            var pieceName = row.getCell(searchArr[0]);
             accurateSearch.addText(rowNumber, composer + pieceName);
         });
         
@@ -46,56 +50,83 @@ module.exports = {
         //Ask about id
         var foundLen = Math.min(foundIds.length, maxResultsPushed);
         var prompt = [];
-        prompt.push(`Sure! Found ${foundLen} results. Please react to the appropriate number for the result that you wanted.`);
+        var menuOptions = [];
+        var resultArr = []
+        prompt += `Sure! Found ${foundLen} results. Please react to the appropriate number for the result that you wanted.`;
 
         for (i=0; i < foundLen; i++){
-            prompt.push(`\n ${i+1}: ${worksheet.getRow(foundIds[i]).getCell(2).value} - ${worksheet.getRow(foundIds[i]).getCell(1).value}`)
+            var composer = worksheet.getRow(foundIds[i]).getCell(2).value;
+            var pieceName = worksheet.getRow(foundIds[i]).getCell(1).value;
+            prompt += `\n ${i+1}: ${composer} - ${pieceName}`;
+
+            var desc = Utility.StringTrim(`${composer} - ${pieceName}`, 100, true);
+            menuOptions.push({
+                label: `Option ${i+1}`,
+                description: desc,
+                value: `Option ${i+1}`,
+            });
+
+            resultArr.push({
+                id: i+1,
+                row: worksheet.getRow(foundIds[i]),
+            });
         }
 
-        var resultId = 0;
+        //Stamps the buttons with current date so they wont mess up
+        var time = Date.now();
+        var menuId = `select ${time}`;
 
-        message.channel.send(prompt).then(async promptMessage => {
-            
-            //Sets up filter and reacts to the message, then wait for user response
-            var filter = (reaction, user) => {
-                return Constants.emojis.includes(reaction.emoji.name) && user.id === message.author.id;
-              };
+        var menu = new MessageActionRow()
+        .addComponents(
+            new MessageSelectMenu()
+                .setCustomId(menuId)
+                .setPlaceholder('Please select one')
+                .addOptions(menuOptions)
+                .setDisabled(false),
+        );
+
+        message.channel.send({
+            content: prompt,
+            components: [menu]
+        }).then(async interaction => {
+
+            const filter = i => i.customId === menuId;
         
-              // Create the collector
-              const collector = promptMessage.createReactionCollector(filter, {
-                max: 1,
-                time: 99999
+            // Create the collector
+            const menuCollector = interaction.createMessageComponentCollector({filter, time: 60000});
+        
+            menuCollector.on('collect', async i => {
+
+                if (!i.isSelectMenu()) {
+                    return interaction.editReply({
+                        content: "Wrong type of interaction...? Weird. Please tell vert about it.",
+                        components: [],
+                    });
+                }  
+
+                var result = resultArr.find(r => `Option ${r.id}` === i.values[0]).row;
+                await i.deferUpdate();
+
+                var resultEmbed = Utility.createPieceEmbed(result.getCell(searchArr[0]).value, result.getCell(searchArr[1]).value,
+                result.getCell(searchArr[2]).value,result.getCell(searchArr[3]).value, result.getCell(searchArr[4]).value,result.getCell(searchArr[5]).value,
+                result.getCell(searchArr[6]).value, result.getCell(searchArr[7]).value, result.getCell(searchArr[8]).value, result.getCell(9).value, searchString);
+
+                message.channel.send({
+                    content: "Sure! Here you go",
+                    embeds: [resultEmbed],
                 });
-            
-              collector.on('collect', (reaction, user) => {
-                resultId = Constants.emojis.indexOf(reaction.emoji.name);
-                // console.log(`Collected ${resultId} from ${user.tag}`);
-                if (resultId === 0) {
-                    promptMessage.delete();
-                    return;
-                }
-                
-                var r = worksheet.getRow(foundIds[resultId - 1]);
 
-                var resultEmbed = ExcelUtility.createPieceEmbed(r.getCell(1).value, r.getCell(2).value,
-                r.getCell(3).value,r.getCell(5).value, r.getCell(9).value,r.getCell(10).value,
-                r.getCell(6).value, r.getCell(7).value, r.getCell(8).value, r.getCell(4).value, searchString);
+                interaction.edit({
+                    content: prompt,
+                    components: []
+                })
+                menuCollector.stop('Option Selected');
+            });
 
-                message.channel.send(resultEmbed);
+            menuCollector.on('end', async collected => {
+                Utility.DebugLog(`Search collector ended. Reason: ${menuCollector.endReason}`)
             });
             
-            //reacts with the number Constants.emojis
-            try {
-                for(i=1; i <= foundLen; i++){
-                    await promptMessage.react(Constants.emojis[i]);
-                }
-                await promptMessage.react(Constants.emojis[0]);
-            } catch (error) {
-                console.error('Reaction failed');
-                promptMessage.delete();
-                message.channel.send(errortexts[2] + ` ` + errortext);
-                return;
-            }
         });
 	},
 };
