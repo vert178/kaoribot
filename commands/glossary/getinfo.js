@@ -6,31 +6,33 @@ module.exports = {
 	restricted: true,
 	async execute(message, args, Constants, ExcelUtility, Utility) {
 
-		const workbook = await ExcelUtility.loadExcel(true);
-		const worksheet = workbook.worksheets[1];
-		const votesheet = workbook.worksheets[2];
+		return message.channel.send("This command is currently under development. Please come back later!")
 
-		var searchString = ` `;
-        for (i=0; i < args.length; i++){
-            searchString += args[i];
-            searchString += ' ';
-        }
+		// const workbook = await ExcelUtility.loadExcel(true);
+		// const worksheet = workbook.worksheets[1];
+		// const votesheet = workbook.worksheets[2];
 
-        var rowNr = findMatch(searchString);
+		// var searchString = ` `;
+        // for (i=0; i < args.length; i++){
+        //     searchString += args[i];
+        //     searchString += ' ';
+        // }
 
-		if (rowNr <= 0) return console.log(`Invalid initiator`);
+        // var rowNr = findMatch(searchString);
 
-		var voteInfo = ExcelUtility.getVoteInfo(worksheet.getRow(rowNr).getCell(1).value, votesheet);
+		// if (rowNr <= 0) return console.log(`Invalid initiator`);
+
+		// var voteInfo = ExcelUtility.getVoteInfo(worksheet.getRow(rowNr).getCell(1).value, votesheet);
 		
-		message.channel.send(`Info for ${worksheet.getRow(rowNr).getCell(2).value}: ${voteInfo[0]}, ${voteInfo[1]}, ${voteInfo[2]}, ${voteInfo[3]}`);
+		// message.channel.send(`Info for ${worksheet.getRow(rowNr).getCell(2).value}: ${voteInfo[0]}, ${voteInfo[1]}, ${voteInfo[2]}, ${voteInfo[3]}`);
 
-		function findMatch(arg) {
-            for (i=2; i <= worksheet.actualRowCount; i++){
-                var toCompare = worksheet.getRow(i).getCell(2).value;
-                var arg = arg.toLowerCase().trim();
-                if(toCompare === arg) return i;
-            }
-			return -1;
-        }
+		// function findMatch(arg) {
+        //     for (i=2; i <= worksheet.actualRowCount; i++){
+        //         var toCompare = worksheet.getRow(i).getCell(2).value;
+        //         var arg = arg.toLowerCase().trim();
+        //         if(toCompare === arg) return i;
+        //     }
+		// 	return -1;
+        // }
 	},
 };

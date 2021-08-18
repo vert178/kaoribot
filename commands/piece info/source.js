@@ -9,28 +9,30 @@ module.exports = {
     minArgs: 1,
 	async execute(message, args, Utility) {
 
-        const workbook = await Utility.loadExcel(true);
+        return message.channel.send("This command is currently under development. Please come back later!")
 
-        const votesheet = workbook.worksheets[2];
+        // const workbook = await Utility.loadExcel(true);
 
-        if (!args[0]) return message.channel.send(`What are you trying to ask for?`);
+        // const votesheet = workbook.worksheets[2];
 
-        switch (args[0].toLowerCase().trim())
-        {
-            case `code`:
-                return message.channel.send(`Sure! Here is the link: ${link}`);
+        // if (!args[0]) return message.channel.send(`What are you trying to ask for?`);
+
+        // switch (args[0].toLowerCase().trim())
+        // {
+        //     case `code`:
+        //         return message.channel.send(`Sure! Here is the link: ${link}`);
     
-            case `data`:
-                votesheet.state = 'veryHidden';
-                return message.channel.send(new MessageAttachment(`data.xlsx`))
-                .catch(error => console.log(error));
+        //     case `data`:
+        //         votesheet.state = 'veryHidden';
+        //         return message.channel.send(new MessageAttachment(`data.xlsx`))
+        //         .catch(error => console.log(error));
 
-            case `template`:
-                return message.channel.send(new MessageAttachment(`template.xlsx`))
-                .catch(error => console.log(error));
+        //     case `template`:
+        //         return message.channel.send(new MessageAttachment(`template.xlsx`))
+        //         .catch(error => console.log(error));
 
-            default:
-                return message.channel.send(`What are you trying to ask for?`);
-        }
+        //     default:
+        //         return message.channel.send(`What are you trying to ask for?`);
+        // }
 	},
 };

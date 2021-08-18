@@ -12,6 +12,7 @@ Major:
 - Moderation functions
 - Role Restrictions
 - Search function advanced verification
+- Streamline bannedUsername register process
 
 Minor:
 Change role to yellow whenever she joins a server
