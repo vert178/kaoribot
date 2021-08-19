@@ -2,9 +2,10 @@ const fs = require('fs');
 
 module.exports = {
 	name: 'reload',
-    alias: ['r'],
+    alias: ['r', 'load', 'refresh'],
 	description: 'Why do you even care',
     hidden: true,
+    roleRestricted: true,
     minArgs: 1,
 	execute(message, args, Utility) {
         
@@ -41,8 +42,6 @@ module.exports = {
         //Sends message to confirm reload
         message.channel.send(`${command.name}\? ok sure`);
 
-        console.log(`======================================================================================================= \n
-        ===================================== Reloaded ${command.name} ======================================= \n
-        =======================================================================================================`);
+        Utility.DebugLog(`${message.author.tag} reloaded ${command.name}`);
 	},
 };

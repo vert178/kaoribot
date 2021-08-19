@@ -8,12 +8,19 @@ module.exports = {
 
         var arg = args[0].toLowerCase().trim();
 
-        if (arg === `girl`) {
-            message.channel.send(`Thanks :heart:`);
-            console.log(`${message.author.tag} just patted kaori <3`);
-        } else if  (arg === `bot`) {
-            message.channel.send(`Beep boop, boop beep`);
-            console.log(`${message.author.tag} just patted bot <3`); 
+        switch (arg) {
+            case 'girl':
+                message.channel.send(`Thanks :heart:`);
+                console.log(`${message.author.tag} just patted kaori <3`);
+                break;
+
+            case 'bot':
+                message.channel.send(`Beep boop, boop beep`);
+                console.log(`${message.author.tag} just patted bot <3`); 
+                break;
+
+            default:
+                return;
         }
 	},
 };

@@ -1,5 +1,8 @@
-const {MessageAttachment} = require('discord.js');
-const link = `https://github.com/vert178/kaoribot`;
+const { MessageAttachment } = require('discord.js');
+
+const githubLink = `https://github.com/vert178/kaoribot`;
+const dataLink = 'https://docs.google.com/spreadsheets/d/1TaKs92pWei6Gr0JsRNnf_HLOLm545XkyXHYgpC58QMg/';
+
 module.exports = {
     name: `source`,
     description: `Gives you a link to my source code or the data . `,
@@ -9,30 +12,16 @@ module.exports = {
     minArgs: 1,
 	async execute(message, args, Utility) {
 
-        return message.channel.send("This command is currently under development. Please come back later!")
-
-        // const workbook = await Utility.loadExcel(true);
-
-        // const votesheet = workbook.worksheets[2];
-
-        // if (!args[0]) return message.channel.send(`What are you trying to ask for?`);
-
-        // switch (args[0].toLowerCase().trim())
-        // {
-        //     case `code`:
-        //         return message.channel.send(`Sure! Here is the link: ${link}`);
+        switch (args[0].toLowerCase().trim())
+        {
+            case `code`:
+                return message.channel.send(`Sure! Here is the link: ${githubLink}`);
     
-        //     case `data`:
-        //         votesheet.state = 'veryHidden';
-        //         return message.channel.send(new MessageAttachment(`data.xlsx`))
-        //         .catch(error => console.log(error));
+            case `data`:
+                return message.channel.send(`Sure! Here is the link: ${dataLink}`);
 
-        //     case `template`:
-        //         return message.channel.send(new MessageAttachment(`template.xlsx`))
-        //         .catch(error => console.log(error));
-
-        //     default:
-        //         return message.channel.send(`What are you trying to ask for?`);
-        // }
+            default:
+                return message.channel.send(`What are you trying to ask for?`);
+        }
 	},
 };

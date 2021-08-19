@@ -1,4 +1,5 @@
-const { prefix, prefix2 } = require('./../../config.json');
+const { prefix, prefix2 } = require('./../utilities/constant.js');
+
 module.exports = {
     name: `help`,
     description: `Well...`,

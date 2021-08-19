@@ -1,6 +1,6 @@
 const fs = require('fs');
-const {prefix, prefix2, permittedID } = require('./../config.json');
 const { Collection } = require('discord.js');
+const { prefix, prefix2, permittedID, permittedRoles } = require('../commands/utilities/constant');
 const commandPath = './commands';
 
 module.exports = {
@@ -38,7 +38,8 @@ module.exports = {
     
         //Process command
         if (!command || command.isUtility) return;
-        if (command.restricted && !Utility.CheckIfArrayContains([message.author.id], permittedID)) return message.channel.send(`No?`)
+        if (command.userRestricted && !Utility.CheckIfArrayContains([message.author.id], permittedID)) return message.channel.send(`No?`);
+        if (command.roleRestricted && message.channel.type === 'dm' && !Utility.CheckIfArrayContains(message.member._roles, permittedRoles)) return message.channel.send(`No?`);
         if (command.serverOnly && message.channel.type === 'dm') return message.reply('This is dms, and it\'s not exactly the best place to play with this command...');   
         if (command.minArgs && args.length < command.minArgs) return message.channel.send(`Whoops that doesn't sound like a valid command`);
 

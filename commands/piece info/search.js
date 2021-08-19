@@ -10,7 +10,7 @@ var errortexts = ["I can't locate the database for some reason :frowning:",
 var errortext = "\ \ Please tell vert if this problem persists";
 
 //In order: Name, Composer, Level, Length, Link, Description, Period, Sonata, Etude, Review
-const { searchArr } = require(`./../../config.json`);
+const { searchArr } = require('./../utilities/constant.js');
 
 module.exports = {
     name: `search`,

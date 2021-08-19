@@ -1,6 +1,6 @@
 const Excel = require('exceljs');
 const workbook = new Excel.Workbook(); 
-const {filename, color} = require(`./../../config.json`);
+const {filename, color} = require('./../utilities/constant.js');
 const { MessageAttachment, MessageEmbed } = require('discord.js');
 
 module.exports = {

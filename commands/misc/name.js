@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 const notes = ["C", "C#","D", "D#","E", "F", "F#","G", "Ab","A", "Bb", "B"];
 
 const keys = ["C major", "C minor", "Db major", "C# minor",

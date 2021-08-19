@@ -1,18 +1,11 @@
 const AccurateSearch = require('accurate-search');
 const { MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } = require('discord.js');
 
-//An array of role ids that are allowed to verify stuff. Currently in the following order:
-//Advanced, Proficient, Virtuoso, Staff, Helpers
-const permittedRoles = ["402936943018639381",
-"402937022076944405",
-"704128964632772648",
-"412018027832279041",
-"840939368494661642"];
-
-const { infoArr, filename } = require(`./../../config.json`);
+const { infoArr, filename, permittedRoles } = require(`./../utilities/constant.js`);
 
 // max results for search. Maximum 5
 const maxResultsPushed = 5;
+
 // length of description in results page (words)
 const maxDescDispLength = 12;
 
