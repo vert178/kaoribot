@@ -14,13 +14,13 @@ module.exports = {
     alias: ['choose'],
 	description: 'She will give you a random key, or a few random notes or whatever. Just a funny little command with basically no use.',
     example: `Kaori, name 3 notes`,
-    args: ['notes', 'keys'],
-    minArgs: 1,
+    args: ['notes', 'keys', 'coin'],
+    minArgs: 2,
 	async execute(message, args, Utility) {
 
         var howMany = 0;
 
-        if (args.length = 1 || args[0].toLowerCase() === 'a' || args[0].toLowerCase() === 'an') howMany = 1;
+        if (args[0].toLowerCase() === 'a' || args[0].toLowerCase() === 'an') howMany = 1;
         else if (Number(args[0]) && Number(args[0]) > 0) howMany = Number(args[0]);
         else return message.channel.send("Whoops that's not a valid command!");
 
@@ -41,6 +41,7 @@ module.exports = {
             case 'headsortails':
             case 'hot':
             case 'coin':
+            case 'coins':
                 arr = coin;
                 break;
 

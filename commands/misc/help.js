@@ -39,12 +39,12 @@ module.exports = {
 	        return message.reply('Hey that\'s not a valid command!');
         }
 
-        data.push(`**Name:** ${command.name}`);
+        data += `**Name:** ${command.name}\n`;
 
-        if (command.alias) data += `**Aliases:** ${command.alias.join(', ')}`;
-        if (command.args) data += `**Arguments:** ${command.args.join(', ')}`;
-        if (command.description) data += `**Description:** ${command.description}`;
-        if (command.example) data += `**Example:** ${command.example}`;
+        if (command.alias) data += `**Aliases:** ${command.alias.join(', ')}\n`;
+        if (command.args) data += `**Arguments:** ${command.args.join(', ')}\n`;
+        if (command.description) data += `**Description:** ${command.description}\n`;
+        if (command.example) data += `**Example:** ${command.example}\n`;
 
         message.channel.send(data, { split: true });
 	},

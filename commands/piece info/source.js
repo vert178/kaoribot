@@ -20,6 +20,9 @@ module.exports = {
             case `data`:
                 return message.channel.send(`Sure! Here is the link: ${dataLink}`);
 
+            case `template`:
+                return message.channel.send(`We don't do templates anymore. Use "kaori, suggest (piece)" to enter info for a new piece. How did you find this btw?`);
+
             default:
                 return message.channel.send(`What are you trying to ask for?`);
         }

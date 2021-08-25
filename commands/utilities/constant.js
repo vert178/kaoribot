@@ -3,7 +3,7 @@ module.exports = {
     hidden: true,
     isUtility: true,
     
-    prefix : "kaori, ",
+    prefix : "debug, ",
     prefix2 : "k ",
     
     //Me, Darwyn

@@ -11,12 +11,12 @@ module.exports = {
         switch (arg) {
             case 'girl':
                 message.channel.send(`Thanks :heart:`);
-                console.log(`${message.author.tag} just patted kaori <3`);
+                Utility.DebugLog(`${message.author.tag} just patted kaori <3`);
                 break;
 
             case 'bot':
                 message.channel.send(`Beep boop, boop beep`);
-                console.log(`${message.author.tag} just patted bot <3`); 
+                Utility.DebugLog(`${message.author.tag} just patted bot <3`); 
                 break;
 
             default:

@@ -11,7 +11,7 @@ const maxDescDispLength = 12;
 
 module.exports = {
     name: `tell`,
-    description: `Looks up info for bot-faq function. Still in development so it might not function correctly`,
+    description: `Looks up info for bot-faq function.`,
     alias: [`answer`, `t`,],
     example: `Kaori, tell piano`,
     minArgs: 1,
@@ -141,7 +141,7 @@ module.exports = {
 
                 const filter = i => (i.customId === upvoteID || i.customId === downvoteID);
 
-                const collector = interaction.channel.createMessageComponentCollector({ filter, time: 999999 });
+                const collector = interaction.channel.createMessageComponentCollector({ filter, time: 3000 });
 
                 var isVoted = false;
                 
@@ -197,7 +197,6 @@ module.exports = {
                         embeds: [embed], 
                         components: [] 
                     });
-                    isVoted = false;
                     
                     //Write new data
                     if (isVoted)
