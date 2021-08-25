@@ -128,11 +128,6 @@ A command must have a \emph{name} and an \emph{execute} function. The former is 
 \subsection{Hidden}
 \textbf{Type: boolean} \hspace{5pt} Whether the command is not displayed when "Kaori, help" is called.
 
-% \subsection{Cooldown}
-% \textbf{Type: integer} \hspace{5pt} The amount of time (in seconds) between each command.
-
-% \subsection{MinArgs}
-% \textbf{Type: integer} \hspace{5pt} The minimum number of arguments required for command execution.
 
 \subsection{Execute}
 \textbf{Type: function(message, args)} \hspace{5pt}
@@ -141,18 +136,6 @@ The body of the command to be called and executed if the command is initiated.
 \medskip
 
 The strings of text that follows a command are called arguments (args). They are separated by spaces. 
-
-% \subsection{Events}
-% An event is something triggered by Discord API itself, which represents passive events, such as someone joining the server, someone sending a message etc.
-
-% \subsubsection{Name}
-% \textbf{Type: string} \hspace{5pt} The initiator of the event. Usually something more descriptive and you can search it up on Discord JS documentation.
-
-% \subsubsection{Once}
-% \textbf{Type: boolean} \hspace{5pt} Whether the command should only be executed once.
-
-% \subsubsection{Execute}
-% \textbf{Type: function(args, client)} \hspace{5pt} The body of the event to be executed the event is triggered.
 
 \newpage
 
