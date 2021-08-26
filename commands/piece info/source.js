@@ -6,7 +6,7 @@ const dataLink = 'https://docs.google.com/spreadsheets/d/1TaKs92pWei6Gr0JsRNnf_H
 module.exports = {
     name: `source`,
     description: `Gives you a link to my source code or the data . `,
-    args: [`code`, `data`, 'template'],
+    args: [`code`, `data`],
     example: `Kaori, source data`,
     cooldown: 5,
     minArgs: 1,

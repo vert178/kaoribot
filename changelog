@@ -9,6 +9,7 @@ Ver 2.1 Updates:
 - GetInfo function
 - Role Restrictions
 - Source function (kinda sorta fixed I don't want to bother with message attachments)
+- Commented out search function for maintenence
 
 Ver 2.0 Updates:
 - Quick update to convert everything to be compatible with DiscordAPI v13.0
