@@ -1,6 +1,5 @@
 To be added:
 - Search function advanced verification
-- Search function auto complete
 - Streamline bannedUsername register process
 - Add cooldowns
 - Change tell (info array) to a similar fetch function
@@ -10,6 +9,8 @@ To Do:
 - Edit tell function to new data fetch syntaxgi
 
 Ver 2.2 Updates:
+- Added updateinfo method to scrap info from henle site
+- Added search function auto complete for links and duration 
 - Updated permittedRoles and advRoles
 - Updated code structure for tell and search
 - Removed help function sending stuff to dms
