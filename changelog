@@ -2,14 +2,28 @@ To be added:
 - Search function advanced verification
 - Search function auto complete
 - Streamline bannedUsername register process
-- Cooldown
+- Add cooldowns
+- Change tell (info array) to a similar fetch function
+- Fix guildMemberAdd function
+
+To Do:
+- Edit search function to new data fetch syntax
+- Let the code do the data entry for you :)
+
+Ver 2.2 Updates:
+- Updated permittedRoles and advRoles
+- Updated code structure for tell and search
+- Removed help function sending stuff to dms
+- Removed "test" and "wake" as the alias for ping
+- Updated code structure: removed Utility as an argument (bad programming practice)
+- Cleaned up code formatting
 
 Ver 2.1 Updates:
 - Fixed tell upvotes not writing to database
-- GetInfo function
-- Role Restrictions
-- Source function (kinda sorta fixed I don't want to bother with message attachments)
-- Commented out search function for maintenence
+- Added GetInfo function
+- Added Role Restrictions
+- Added Source function (kinda sorta fixed I don't want to bother with message attachments)
+- Removed search function for maintenence
 
 Ver 2.0 Updates:
 - Quick update to convert everything to be compatible with DiscordAPI v13.0

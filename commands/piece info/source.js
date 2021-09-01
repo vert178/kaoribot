@@ -2,6 +2,7 @@ const { MessageAttachment } = require('discord.js');
 
 const githubLink = `https://github.com/vert178/kaoribot`;
 const dataLink = 'https://docs.google.com/spreadsheets/d/1TaKs92pWei6Gr0JsRNnf_HLOLm545XkyXHYgpC58QMg/';
+const Utility = require('./../utilities/utility.js');
 
 module.exports = {
     name: `source`,
@@ -10,7 +11,7 @@ module.exports = {
     example: `Kaori, source data`,
     cooldown: 5,
     minArgs: 1,
-	async execute(message, args, Utility) {
+	async execute(message, args) {
 
         switch (args[0].toLowerCase().trim())
         {

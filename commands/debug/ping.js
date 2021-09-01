@@ -1,10 +1,9 @@
 module.exports = {
     name: `ping`,
     description: `Attempts to ping me, just to check if I have arrived`,
-    alias: [`test`, `wake`],
     example: `Kaori, ping`,
     cooldown: 10,
-	execute(message, args, Utility) {
+    execute(message, args) {
         const latency = Date.now() - message.createdTimestamp;
 
         if (args.length > 0 && args[0] === "debug") {
@@ -12,9 +11,8 @@ module.exports = {
             \nTime now is : ${Date.now()} 
             \nMessage Created at : ${message.createdTimestamp}
             \nTook : ${latency}`);
-        }
-        else {
+        } else {
             message.channel.send(`Hiya I am ${latency}ms late. Not too bad :smile:`);
         }
-	},
+    },
 };

@@ -1,0 +1,17 @@
+{    
+    "prefix" : "kaori, ",
+    "prefix2" : "k, ",
+    
+    "remark1": "Me, Darwyn",
+    "permittedID": ["413240425613230080", "746528547513827390"],
+
+    "remark2": "Admin, Committee",
+    "permittedRoles": ["876092543639642143", "876092669980475402"],
+
+    "remark3": "//Admin, Committee, Helpers, Maestro, Expert",
+    "advancedRoles": ["876092543639642143", "876092669980475402", "876093009115099207", "878292099425005618", "878034032225562644"],
+
+    "filename": "data.xlsx",
+
+    "color": "#fbefa4"
+}
