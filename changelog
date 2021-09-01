@@ -7,8 +7,7 @@ To be added:
 - Fix guildMemberAdd function
 
 To Do:
-- Edit search function to new data fetch syntax
-- Let the code do the data entry for you :)
+- Edit tell function to new data fetch syntaxgi
 
 Ver 2.2 Updates:
 - Updated permittedRoles and advRoles
