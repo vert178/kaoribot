@@ -15,10 +15,16 @@ var errortexts = ["I can't locate the database for some reason :frowning:",
 
 var errortext = "\ \ Please tell vert if this problem persists";
 
-const Utility = require('./../utilities/utility.js');
+const {
+    YtAPIKey
+} = require('../../config.json');
+const YouTube = require('simple-youtube-api');
+const Utility = require("./../utilities/utility.js");
+const youtube = new YouTube(YtAPIKey);
 
 const {
-    color
+    color,
+    filename
 } = require('./../utilities/constant.json')
 
 module.exports = {
@@ -121,17 +127,18 @@ module.exports = {
                 var result = resultArr.find(r => `Option ${r.id}` === i.values[0]).row;
                 await i.deferUpdate();
 
-                var resultEmbed = createPieceEmbed(
-                    Utility.getInfo(result, "name"), 
+                var resultEmbed = await createPieceEmbed(
+                    row,
+                    Utility.getInfo(result, "name"),
                     Utility.getInfo(result, "composer"),
-                    Utility.getInfo(result, "level"), 
-                    Utility.getInfo(result, "duration"), 
-                    Utility.getInfo(result, "link"), 
+                    Utility.getInfo(result, "level"),
+                    Utility.getInfo(result, "duration"),
+                    Utility.getInfo(result, "link"),
                     Utility.getInfo(result, "description"),
-                    Utility.getInfo(result, "period"), 
-                    Utility.getInfo(result, "sonata"), 
-                    Utility.getInfo(result, "etude"), 
-                    Utility.getInfo(result, "verify"), 
+                    Utility.getInfo(result, "period"),
+                    Utility.getInfo(result, "sonata"),
+                    Utility.getInfo(result, "etude"),
+                    Utility.getInfo(result, "verify"),
                     searchString);
 
                 message.channel.send({
@@ -153,13 +160,40 @@ module.exports = {
         });
 
         //Creates embed for search function
-        function createPieceEmbed(piecename, comp, lvl, dur, link, desc, prd, sonata, etude, ver, searchString) {
+        //TODO: unfactor
+        async function createPieceEmbed(workbook, row, piecename, comp, lvl, dur, link, desc, prd, sonata, etude, ver, searchString) {
 
             var nametext = Utility.AddEmpty(piecename);
             var comptext = Utility.AddEmpty(comp);
             var lvltext = Utility.AddEmpty(lvl);
-            var durtext = getDur(dur);
-            var linktext = Utility.AddEmpty(link);
+            var durtext = '';
+            var linktext = '';
+            var duration = 0;
+            if (Utility.isEmpty(dur) || Utility.isEmpty(linktext)) {
+                await youtube.searchVideos(nametext + ' ' + comptext, 4)
+                    .then(results => {
+                        linktext = `https://www.youtube.com/watch?v=${results[0].id}`;
+                        youtube.getVideo(linktext)
+                            .then(video => {
+                                Utility.DebugLog("Found video: " + video.title + ". Now on entry " + i);
+                                duration = video.duration.hours * 60 + video.duration.minutes;
+                                if (video.duration.seconds >= 30) duration += 1;
+                                durtext = getDur(duration);
+                            })
+                            .catch(console.log);
+                        Utility.setInfo(row, duration, "duration");
+                        Utility.setInfo(row, linktext, "link");
+                        try {
+                            await workbook.xlsx.writeFile(filename);
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    })
+                    .catch(console.log);
+            }
+
+            durtext = getDur(dur);
+            linktext = Utility.AddEmpty(link);
             var desctext = Utility.AddEmpty(desc);
             var verify = Utility.CheckValue(ver, "This is a verified entry. Please feel free to use it.",
                 "This is NOT a verified entry. Please take the information cautiously");

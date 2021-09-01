@@ -9,7 +9,7 @@ const {
     MessageEmbed
 } = require('discord.js');
 
-module.exports = {
+var self = module.exports = {
 
     hidden: true,
     isUtility: true,
@@ -17,7 +17,7 @@ module.exports = {
     //Add an empty character to a string if its empty
     AddEmpty(string) {
         var str = '\u200B';
-        if (!this.isEmpty(string)) str += `${string}`;
+        if (!self.isEmpty(string)) str += `${string}`;
         return str;
     },
 
@@ -140,43 +140,47 @@ module.exports = {
 
         switch (i) {
             case "name":
-                return this.getCellValue(row.getCell(1).value);
+                return self.getCellValue(row.getCell(1).value);
 
             case "composer":
-                return this.getCellValue(row.getCell(2).value);
+                return self.getCellValue(row.getCell(2).value);
 
             case "level":
-                return this.getCellValue(row.getCell(3).value);
+                return self.getCellValue(row.getCell(3).value);
 
             case "length":
             case "duration":
-                return this.getCellValue(row.getCell(4).value);
+                return self.getCellValue(row.getCell(4).value);
 
             case "link":
-                return this.getCellValue(row.getCell(6).value);
+                return self.getCellValue(row.getCell(6).value);
 
             case "description":
-                return this.getCellValue(row.getCell(7).value);
+                return self.getCellValue(row.getCell(7).value);
 
             case "param":
-                return this.getCellValue(row.getCell(5).value);
+                return self.getCellValue(row.getCell(5).value);
 
             case "verify":
-                var p = this.getCellValue(row.getCell(5).value)
-                return this.readBit(p, 0);
+                var p = self.getCellValue(row.getCell(5).value)
+                return self.readBit(p, 0);
 
             case "period":
-                var p = this.getCellValue(row.getCell(5).value)
-                if (!this.isPositiveInteger(p)) return -1;
+                var p = self.getCellValue(row.getCell(5).value)
+                if (!self.isPositiveInteger(p)) return -1;
                 return (p & 14) >> 1; //14 is 1110 so this turns of everything besides second, 3rd, 4th last bits
 
             case "sonata":
-                var p = this.getCellValue(row.getCell(5).value)
-                return this.readBit(p, 4);
+                var p = self.getCellValue(row.getCell(5).value)
+                return self.readBit(p, 4);
 
             case "etude":
-                var p = this.getCellValue(row.getCell(5).value)
-                return this.readBit(p, 5);
+                var p = self.getCellValue(row.getCell(5).value)
+                return self.readBit(p, 5);
+
+            case "henle":
+                var p = self.getCellValue(row.getCell(5).value)
+                return self.readBit(p, 6);
 
             default:
                 return "N/A";
@@ -205,7 +209,7 @@ module.exports = {
                 row.getCell(4).value = value;
                 break;
 
-            case "description":
+            case "param":
                 row.getCell(5).value = value;
                 break;
 
@@ -218,30 +222,30 @@ module.exports = {
                 break;
 
             case "verify":
-                var p = this.getCellValue(row.getCell(5).value);
-                row.getCell(5).value = this.setBit(p, 0, value);
+                var p = self.getCellValue(row.getCell(5).value);
+                row.getCell(5).value = self.setBit(p, 0, value);
                 break;
 
             case "period":
-                var p = this.getCellValue(row.getCell(5).value);
+                var p = self.getCellValue(row.getCell(5).value);
                 row.getCell(5).value = (p & ~(14)) | value << 1;
                 break;
 
             case "sonata":
-                var p = this.getCellValue(row.getCell(5).value);
-                row.getCell(5).value = this.setBit(p, 4, value);
+                var p = self.getCellValue(row.getCell(5).value);
+                row.getCell(5).value = self.setBit(p, 4, value);
                 break;
 
             case "etude":
-                var p = this.getCellValue(row.getCell(5).value);
-                row.getCell(5).value = this.setBit(p, 5, value);
+                var p = self.getCellValue(row.getCell(5).value);
+                row.getCell(5).value = self.setBit(p, 5, value);
                 break;
 
         }
     },
 
     readBit(int, N) {
-        if (!this.isPositiveInteger(int)) return false;
+        if (!self.isPositiveInteger(int)) return false;
         var i = Number(int);
         i &= (1 << N);
         return i > 0;

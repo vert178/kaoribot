@@ -1,14 +1,16 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const readline = require("readline");
-const Constant = require('./../utilities/constant.json')
+const {
+    filename
+} = require('./../utilities/constant.json')
 const Excel = require('exceljs');
-const Utility = require('./../utilities/utility.js');
 
 const {
     YtAPIKey
 } = require('../../config.json');
 const YouTube = require('simple-youtube-api');
+const Utility = require("./../utilities/utility.js");
 const youtube = new YouTube(YtAPIKey);
 
 module.exports = {
@@ -22,7 +24,7 @@ module.exports = {
         var isSoftUpdate = true;
         if (args[0] && args[0] === "hard") isSoftUpdate = false;
 
-        message.reply("Update initiated! Please wait.");
+        message.channel.send("Update initiated! Please wait.");
 
         var obj = {
             listings: []
@@ -66,11 +68,11 @@ module.exports = {
             composer = await page.$eval('h2.sub-title', el => el.textContent)
 
             title = await page.$eval('h2.main-title', el => el.textContent)
-            console.log("scraping the data of article " + title)
+            Utility.DebugLog("scraping the data of article " + title)
             try {
                 subtitle = await page.$eval('div.article-contents>ul:nth-child(2) strong', el => el.textContent);
             } catch (error) {
-                console.log(error);
+                //console.log(error);
             }
 
             try {
@@ -84,7 +86,7 @@ module.exports = {
                 }
 
             } catch (error) {
-                console.log(error);
+                //console.log(error);
             }
 
             const levelsTitles = await page.$x('//div[@class="article-contents"]/ul[position()>2]/li[1]');
@@ -119,64 +121,85 @@ module.exports = {
         // let json = JSON.stringify(obj, null, 2);
         // fs.writeFile('output.json', json, function (error) {
         //     if (error) throw error;
-        //     console.log('File Saved!!! to output.json');
+        //     Utility.DebugLog('File Saved!!! to output.json');
         // });
+
+        browser.close();
+
+        console.log(filename);
 
         const workbook = await Utility.loadExcel(true);
         const worksheet = workbook.getWorksheet('Piece Info');
 
-        for (listing in obj.listings) {
+        for (let i = 0; i <= obj.listings.length; i++) {
 
-            //Name
-            var redundantSubtitile = listing.title.toLowerCase() === listing.subtitle.toLowerCase() || Utility.isEmpty(listing.subtitle);
-            var name = redundantSubtitile ? `${listing.title} - ${listing.name}` : `${listing.title} - ${listing.subtitle} - ${listing.name}`;
+            if (i === obj.listings.length) {
+                try {
+                    await workbook.xlsx.writeFile(filename);
+                    return message.reply(`Data written to database. Time for bubble tea :bubble_tea:`);
+                } catch (error) {
+                    console.log(error);
+                }
+            } else {
+                const listing = obj.listings[i];
 
-            //Period
-            var period = getPeriod(listing.composer);
+                //Name
+                var name = Utility.isEmpty(listing.subtitle) ? listing.name.trim() : `${listing.subtitle.trim()} - ${listing.name.trim()}`;
 
-            //Find duplicate and determine update method
-            var duplicate = CheckForDuplicates(name, worksheet);
-            var row = worksheet.addRow([]);
-            var description = Utility.AddEmpty('');
+                //Period
+                var period = getPeriod(listing.composer.trim());
 
-            if (duplicate > 0) {
-                row = worksheet.getRow(duplicate);
-                description = Utility.getInfo(row, "description");
+                //Break out if there is no level or the composer is unknown (which means its a compilation book and we don't want that)
+                if (isSoftUpdate && (listing.level === undefined || period > 3)) continue;
+
+                //Find duplicate and determine update method
+                var duplicate = CheckForDuplicates(name, worksheet);
+                var row = worksheet.addRow([]);
+                var description = Utility.AddEmpty('');
+
+                if (duplicate > 0) {
+                    row = worksheet.getRow(duplicate);
+                    description = Utility.getInfo(row, "description");
+                }
+
+                if (isSoftUpdate && Utility.getInfo(row, "henle")) continue;
+
+                //Level
+                var level = listing.level !== undefined && Utility.isPositiveInteger(listing.level) ? Number(listing.level) : 0;
+
+                //Duration and link
+                var duration = 0;
+                var link = ''; //Placeholder
+
+                await youtube.searchVideos(name, 4)
+                    .then(results => {
+                        link = `https://www.youtube.com/watch?v=${results[0].id}`;
+                        youtube.getVideo(link)
+                            .then(video => {
+                                Utility.DebugLog("Found video: " + video.title + ". Now on entry " + i);
+                                duration = video.duration.hours * 60 + video.duration.minutes;
+                                if (video.duration.seconds >= 30) duration += 1;
+                                link = `https://www.youtube.com/watch?v=${video.id}`;
+                            })
+                            .catch(console.log);
+                    })
+                    .catch(console.log);
+
+                //Params
+                var sonata = Utility.StringContainAtLeast(name, ["sonata", "movement", "movements"], 1);
+                var etude = Utility.StringContainAtLeast(name, ["étude", "etude", "etudes", "études", "toccata", "study"], 1);
+
+                Utility.setInfo(row, name, "name");
+                Utility.setInfo(row, listing.composer.trim(), "composer");
+                Utility.setInfo(row, level, "level");
+                Utility.setInfo(row, duration, "duration");
+                Utility.setInfo(row, link, "link");
+                Utility.setInfo(row, description, "description");
+                Utility.setInfo(row, 65, "param");
+                Utility.setInfo(row, sonata, "sonata");
+                Utility.setInfo(row, etude, "etude");
+                Utility.setInfo(row, period, "period");
             }
-
-            if (isSoftUpdate && (listing.level === undefined || period > 3)) continue;
-
-            //Level
-            var level = listing.level !== undefined ? listing.level : 0;
-
-            //Duration and link
-            var video = GetTrustedVideos(name);
-            var duration = video.duration.seconds >= 30 ? duration.hours * 60 + duration.minutes + 1 : duration.hours * 60 + duration.minutes
-            var link = `https://www.youtube.com/watch?v=${video.id}`;
-
-            //Params
-            var sonata = Utility.StringContainAtLeast(name, ["sonata", "movement", "movements"], 1);
-            var etude = Utility.StringContainAtLeast(name, ["étude", "etude", "etudes", "études", "toccata", "study"], 1);
-
-            Utility.setInfo(row, name, "name");
-            Utility.setInfo(row, listing.composer, "composer");
-            Utility.setInfo(row, level, "level");
-            Utility.setInfo(row, duration, "duration");
-            Utility.setInfo(row, link, "link");
-            Utility.setInfo(row, description, "description");
-            Utility.setInfo(row, 65, "param");
-            Utility.setInfo(row, sonata, "sonata");
-            Utility.setInfo(row, etude, "etude");
-            Utility.setInfo(row, period, "period");
-        }
-
-        browser.close();
-
-        try {
-            await workbook.xlsx.writeFile(filename);
-            return message.reply(`Data written to database. Time for bubble tea :bubble_tea:`);
-        } catch (error) {
-            console.log(error);
         }
     },
 };
@@ -188,22 +211,6 @@ function CheckForDuplicates(name, worksheet) {
     });
 
     return -1;
-}
-
-function GetTrustedVideos(name) {
-    const maxResultSearch = 1;
-    youtube.searchVideos(name, maxResultSearch)
-        .then(results => {
-            for (i = 0; i < maxResultSearch; i++) {
-                youtube.getVideo(`https://www.youtube.com/watch?v=${results[i].id}`)
-                    .then(video => {
-                        //Always return first
-                        return video;
-                    })
-                    .catch(console.log);
-            }
-        })
-        .catch(console.log);
 }
 
 const BaroqueComposers = ["Johann Sebastian Bach", "Antonio Soler", "Domenico Scarlatti",
