@@ -13,6 +13,7 @@ Ver 2.2 Updates:
 - Added search function auto complete for links and duration 
 - Updated permittedRoles and advRoles
 - Updated code structure for tell and search
+- Updated Data structure from excel to something else. Full data on github
 - Removed help function sending stuff to dms
 - Removed "test" and "wake" as the alias for ping
 - Updated code structure: removed Utility as an argument (bad programming practice)

@@ -2,10 +2,10 @@
     "prefix" : "kaori, ",
     "prefix2" : "k, ",
     
-    "remark1": "Me, Darwyn",
+    "remark1": "//Me, Darwyn",
     "permittedID": ["413240425613230080", "746528547513827390"],
 
-    "remark2": "Admin, Committee",
+    "remark2": "//Admin, Committee",
     "permittedRoles": ["876092543639642143", "876092669980475402"],
 
     "remark3": "//Admin, Committee, Helpers, Maestro, Expert",

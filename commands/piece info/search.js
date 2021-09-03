@@ -128,7 +128,7 @@ module.exports = {
                 await i.deferUpdate();
 
                 var resultEmbed = await createPieceEmbed(
-                    row,
+                    result,
                     Utility.getInfo(result, "name"),
                     Utility.getInfo(result, "composer"),
                     Utility.getInfo(result, "level"),
@@ -161,7 +161,7 @@ module.exports = {
 
         //Creates embed for search function
         //TODO: unfactor
-        async function createPieceEmbed(workbook, row, piecename, comp, lvl, dur, link, desc, prd, sonata, etude, ver, searchString) {
+        async function createPieceEmbed(row, piecename, comp, lvl, dur, link, desc, prd, sonata, etude, ver, searchString) {
 
             var nametext = Utility.AddEmpty(piecename);
             var comptext = Utility.AddEmpty(comp);
@@ -175,25 +175,28 @@ module.exports = {
                         linktext = `https://www.youtube.com/watch?v=${results[0].id}`;
                         youtube.getVideo(linktext)
                             .then(video => {
-                                Utility.DebugLog("Found video: " + video.title + ". Now on entry " + i);
+                                Utility.DebugLog("Found video: " + video.title);
                                 duration = video.duration.hours * 60 + video.duration.minutes;
                                 if (video.duration.seconds >= 30) duration += 1;
                                 durtext = getDur(duration);
                             })
                             .catch(console.log);
-                        Utility.setInfo(row, duration, "duration");
-                        Utility.setInfo(row, linktext, "link");
-                        try {
-                            await workbook.xlsx.writeFile(filename);
-                        } catch (error) {
-                            console.log(error);
-                        }
                     })
                     .catch(console.log);
+
+                Utility.setInfo(row, duration, "duration");
+                Utility.setInfo(row, linktext, "link");
+                
+                try {
+                    await workbook.xlsx.writeFile(filename);
+                } catch (error) {
+                    console.log(error);
+                }
+            } else {
+                durtext = getDur(dur);
+                linktext = Utility.AddEmpty(link);
             }
 
-            durtext = getDur(dur);
-            linktext = Utility.AddEmpty(link);
             var desctext = Utility.AddEmpty(desc);
             var verify = Utility.CheckValue(ver, "This is a verified entry. Please feel free to use it.",
                 "This is NOT a verified entry. Please take the information cautiously");

@@ -31,7 +31,7 @@ module.exports = {
     async execute(message, args, Utility) {
 
         return message.reply ("This function is under development! Please wait.");
-        //To DO: change info fetch structure to smth like search
+        // //To DO: change info fetch structure to smth like search
         
         const workbook = await Utility.loadExcel(true);
         const worksheet = workbook.worksheets[1];
