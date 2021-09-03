@@ -6,9 +6,8 @@ To be added:
 - Fix guildMemberAdd function
 
 To Do:
-- Edit tell function to new data fetch syntaxgi
 
-Ver 2.2 Updates:
+Ver 3.0 Updates:
 - Added updateinfo method to scrap info from henle site
 - Added search function auto complete for links and duration 
 - Updated permittedRoles and advRoles

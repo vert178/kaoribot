@@ -10,6 +10,7 @@ module.exports = {
     description: `Updates the piece info according to the henle website`,
     hidden: true,
     userRestricted: true,
+    minArgs: 1,
     async execute(message, args) {
 
         var isComposer = args[0].toLowerCase().trim() === "composer";
@@ -71,21 +72,20 @@ module.exports = {
                 await page.waitForSelector('div.article-contents>p.read-more>span', {
                     visible: true,
                 })
-                const [sholwAll] = await page.$x("//div[@class='article-contents']/p[@class='read-more']/span");
-                if (sholwAll) {
-                    await sholwAll.click();
+                const [showAll] = await page.$x("//div[@class='article-contents']/p[@class='read-more']/span");
+                if (showAll) {
+                    await showAll.click();
                 }
-
             } catch (error) {
                 //console.log(error);
             }
 
-            const levelsTitles = await page.$x('//div[@class="article-contents"]/ul[position()>2]/li[1]');
+            const levelsTitles = await page.$x('//div[@class="article-contents"]/ul[position()>1 and @class="content-item"]/li[1]');
             const levelNames = await page.evaluate((...levelsTitles) => {
                 return levelsTitles.map(e => e.textContent);
             }, ...levelsTitles);
 
-            const levelsValues = await page.$x('//div[@class="article-contents"]/ul[position()>2]/li[2]/span');
+            const levelsValues = await page.$x('//div[@class="article-contents"]/ul[position()>1 and @class="content-item"]/li[2]/span');
             const levelValue = await page.evaluate((...levelsValues) => {
                 return levelsValues.map(e => e.textContent);
             }, ...levelsValues);
@@ -93,50 +93,33 @@ module.exports = {
             var levels = []
 
             if (isComposer) {
+                // To be implemented
+            } 
+            else {
                 for (let j = 0; j < levelsTitles.length; j++) {
-                    var name = ""
-                    var level = ""
+                    var name = levelNames[j];
+                    var level = levelValue[j];
+                    var period = getPeriod(composer.trim());
 
-                    name = levelNames[j]
-                    level = levelValue[j]
-
-                    levels.push({
-                        "name": name,
-                        "level": level,
-                        "link": emptystring,
-                        "description": emptystring,
-                        "param": getParam(`${subtitle} ${name}`, composer)
-                    })
-                }
-
-                obj.listings.push({
-                    "composer": composer,
-                    "title": title,
-                    "subtitle": subtitle,
-                    "levels": levels
-                })
-            } else {
-
-                for (let j = 0; j < levelsTitles.length; j++) {
-                    var name = ""
-                    var level = ""
-
-                    name = levelNames[j]
-                    level = levelValue[j]
-
-                    if (!level || level === undefined) continue;
+                    if (level === undefined) continue;
                     if (period > 3) continue;
+                    if (title.trim() === subtitle.trim()) subtitle = emptystring;
 
-                    obj.listings.push({
+                    var entry = {
                         "composer": composer.trim(),
                         "title": title.trim(),
                         "subtitle": subtitle.trim(),
                         "name": name.trim(),
                         "level": level,
+                        "duration": 0,
                         "link": emptystring,
                         "description": emptystring,
                         "param": getParam(`${subtitle} ${name}`, composer)
-                    });
+                    }
+
+                    console.log(entry);
+
+                    obj.listings.push();
                 }
             }
         }
@@ -145,6 +128,7 @@ module.exports = {
         fs.writeFile(path, json, function (error) {
             if (error) throw error;
             Utility.DebugLog('File Saved!!! to output.json');
+            return message.reply("Done!")
         });
 
         browser.close();
@@ -181,6 +165,7 @@ function getParam(name, composer) {
 
     var period = getPeriod(composer.trim());
     param = Search.setParam(param, "period", period);
+    Utility.DebugLog(period + "    " + param);
 
     var sonata = Utility.StringContainAtLeast(name, ["sonata", "movement", "movements"], 1);
     var etude = Utility.StringContainAtLeast(name, ["étude", "etude", "etudes", "études", "toccata", "study"], 1);

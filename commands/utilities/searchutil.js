@@ -1,3 +1,8 @@
+const search = require("../piece info/search");
+
+//The minimum score of a string for it to be qualified a search result. The score is on a scale of 0 to 1.
+const threshold = 0.95;
+
 module.exports = {
     hidden: true,
     isUtility: true,
@@ -5,8 +10,7 @@ module.exports = {
     readParam(param, info) {
 
         //Check if param is a positive integer
-        if (!Number(int) || Number(int) <= 0) return false;
-        var i = Number(int);
+        var i = Number(param);
         var s = info.toLowerCase().trim();
 
         switch (s) {
@@ -30,15 +34,14 @@ module.exports = {
         }
     },
 
+    //Param: the parameter to be changed; info: the info to be changed (string); value: bool, number
     setParam(param, info, value) {
-        //Check if param is a positive integer
-        if (!Number(int) || Number(int) <= 0) return false;
-        var i = Number(int);
+        var i = Number(param);
         var s = info.toLowerCase().trim();
 
         switch (s) {
             case "verify":
-                return setBit(param, 0, value)
+                return setBit(param, 0, value);
 
             case "sonata":
                 return setBit(param, 4, value);
@@ -56,6 +59,23 @@ module.exports = {
             default:
                 throw "Warning: info not identified";
         }
+    },
+
+    //Search for the closest matches with the target string inside the data array. Threshold 
+    //Depreceated
+    search(target, data) {
+        var ratings = [];
+        for (i = 0; i < data.length; i++) {
+            var score = score(target, data[i]);
+            if (score < threshold) continue;
+            ratings.push(i);
+        }
+
+        ratings.sort(function(a,b) {
+            return b.rate - a.rate;
+        });
+
+        return ratings;
     }
 }
 
@@ -67,10 +87,15 @@ function readBit(i, N) {
 
 //Set the N-th bit according to a bool
 function setBit(i, N, value) {
-    if (value) {
+    if (!value) {
         i &= ~(1 << N)
     } else {
         i |= 1 << N
     }
     return i;
+}
+
+//compare the string str against another string, and get a score based on similarity
+function score(str, compareAgainst) {
+
 }

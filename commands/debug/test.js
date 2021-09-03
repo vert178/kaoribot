@@ -1,4 +1,5 @@
 const Utility = require('./../utilities/utility.js');
+const Search = require("./../utilities/searchutil.js");
 
 
 module.exports = {
@@ -11,7 +12,9 @@ module.exports = {
 		var sonata = Utility.StringContainAtLeast(arg, ["sonata", "movement", "movements"], 1);
         var etude = Utility.StringContainAtLeast(arg, ["étude", "etude", "etudes", "études", "toccata", "study"], 1);
 
-        return message.channel.send("sonata: " + sonata + " etude: " + etude);
+        var param = 0;
+		param = Search.setParam(param, "period", 3);
+		console.log(param);
 		
 	},
 };

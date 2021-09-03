@@ -29,9 +29,6 @@ module.exports = {
     minArgs: 1,
     cooldown: 5,
     async execute(message, args, Utility) {
-
-        return message.reply ("This function is under development! Please wait.");
-        // //To DO: change info fetch structure to smth like search
         
         const workbook = await Utility.loadExcel(true);
         const worksheet = workbook.worksheets[1];
@@ -114,7 +111,7 @@ module.exports = {
                 menuCollector.on('collect', async i => {
                     //if somehow it isnt a select menu interaction, return
                     if (!i.isSelectMenu()) {
-                        return interaction.editReply({
+                        return interaction.edit({
                             content: "Wrong type of interaction...? Weird. Please tell vert about it.",
                             component: [],
                         });
