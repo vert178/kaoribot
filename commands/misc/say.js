@@ -16,6 +16,9 @@ const trivia = ["Do you know my birthday is March 13?",
 "My name actually comes from the anime Your Lie in April.",
 "There is a Beta Kaori somewhere in this server, hidden from view from everyone else.",
 "There are 4514 search entries from the official Henle site",
+"It took me a bit more than 51 minutes to index all the Henle entries the first time.",
+"My favourite drink is bubble tea :bubble_tea:. Usually I go for no sugar and half ice",
+"With 738 entries, Schumann has the most number of entries in my database, which is twice more than J.S. Bach, at the second most, with 364 of them.",
 ]
 
 const Utility = require('../utilities/utility.js');
