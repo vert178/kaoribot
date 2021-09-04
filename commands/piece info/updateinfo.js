@@ -14,7 +14,7 @@ module.exports = {
     async execute(message, args) {
 
         var isComposer = args[0].toLowerCase().trim() === "composer";
-        var path = isComposer ? './../../glossary/bybook.json' : './../../glossary/bypiece.json';
+        var path = isComposer ? './data/bybook.json' : './data/bypiece.json';
 
         message.channel.send("Update initiated! Please wait.");
 
@@ -127,7 +127,7 @@ module.exports = {
         let json = JSON.stringify(obj, null, 2);
         fs.writeFile(path, json, function (error) {
             if (error) throw error;
-            Utility.DebugLog('File Saved!!! to output.json');
+            Utility.DebugLog('File Saved!!!');
             return message.reply("Done!")
         });
 
