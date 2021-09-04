@@ -47,11 +47,11 @@ var self = module.exports = {
     },
 
     //Merge a string arg into one string
-    RemergeArgs(args) {
+    RemergeArgs(args, addSpace = true) {
         var searchString = ` `;
         for (i = 0; i < args.length; i++) {
             searchString += args[i];
-            searchString += ' ';
+            if(addSpace) searchString += ' ';
         }
         return searchString;
     },

@@ -1,4 +1,5 @@
 const AccurateSearch = require('accurate-search');
+const fs = require("fs");
 const { MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu } = require('discord.js');
 
 const maxResultsPushed = 5;
@@ -15,9 +16,9 @@ const YouTube = require('simple-youtube-api');
 const Utility = require("./../utilities/utility.js");
 const youtube = new YouTube(YtAPIKey);
 
-const { color, filename } = require('./../utilities/constant.json');
-const { listings } = require('./../../data/bypiece.json');
-
+const { color } = require('./../utilities/constant.json');
+const path = './data/bypiece.json';
+const { listings } = require(`./../../${path}`);
 const SearchUtil = require("./../utilities/searchutil.js");
 
 module.exports = {
@@ -55,7 +56,7 @@ module.exports = {
         }
         var t2 = Date.now();
 
-        Utility.DebugLog(`Searched through ${listings.length} entries, took ${t2 - t1} ms`);
+        // Utility.DebugLog(`Searched through ${listings.length} entries, took ${t2 - t1} ms`);
 
         // No search results found :( returning...
         if (found.length === 0) {
@@ -88,15 +89,13 @@ module.exports = {
                     });
 
                     await i.deferUpdate();
-
                     return;
+
                 } else if (i.isButton()) {
-                    if (i.customId === `${t2} prev` && pageNumber > 1) {
-                        pageNumber -= 1
-                    }
-                    else if (i.customId === `${t2} next` && pageNumber < Math.ceil(found.length/maxResultsPushed)) {
-                        pageNumber += 1
-                    }
+
+                    // Change page number
+                    if (i.customId === `${t2} prev` && pageNumber > 1) pageNumber -= 1  
+                    else if (i.customId === `${t2} next` && pageNumber < Math.ceil(found.length/maxResultsPushed)) pageNumber += 1
                     
                     msg = createPrompt(found, pageNumber, t2);
     
@@ -111,10 +110,14 @@ module.exports = {
 
                 } else {
                     //Fetch result. Minus one since we use zero count
-                    var result = listings[found[Number(i.values) - 1] - 1];
+                    var result = {
+                        id: found[Number(i.values) - 1] - 1,
+                        listing: listings[found[Number(i.values) - 1] - 1],
+                    }
 
                     await i.deferUpdate();
 
+                    //Create the embed
                     var resultEmbed = await createPieceEmbed(result, searchString);
 
                     message.channel.send({
@@ -122,6 +125,7 @@ module.exports = {
                         embeds: [resultEmbed],
                     });
 
+                    //Edits previous message to remove the select menu and stuff
                     m.edit({
                         content: msg.prompt,
                         components: []
@@ -140,40 +144,64 @@ module.exports = {
         async function createPieceEmbed(result, searchString) {
 
             
-            var duration = result.duration;
-            var link = result.link;
+            var duration = result.listing.duration;
+            var link = result.listing.link;
         
             //The autofill for duration and link
             if (duration === 0 || Utility.isEmpty(link)) {
                 //Make request to Youtube API to search
-                var str = result.composer + ' ' + result.subtitle + ' ' + result.name;
+                var str = result.listing.composer + ' ' + result.listing.subtitle + ' ' + result.listing.name;
                 await youtube.searchVideos(str, 4)
-                    .then(results => {
-                        link = `https://www.youtube.com/watch?v=${results[0].id}`;
-                        youtube.getVideo(link)
-                            .then(video => {
-                                Utility.DebugLog("Found video: " + video.title);
-                                duration = video.duration.hours * 60 + video.duration.minutes;
-                                //Rounds up if necessary
-                                if (video.duration.seconds >= 30) duration += 1;
-                            })
-                            .catch(console.log);
+                    .then(r => {
+                        //Only continue if something was found
+                        if (r.length > 0) {
+                            link = `https://www.youtube.com/watch?v=${r[0].id}`;
+                            youtube.getVideo(link)
+                                .then(video => {
+                                    Utility.DebugLog("Found video: " + video.title);
+                                    duration = video.duration.hours * 60 + video.duration.minutes;
+                                    //Rounds up if necessary
+                                    if (video.duration.seconds >= 30) duration += 1;
+
+                                    //Sets info and saves to the file
+                                    listings[result.id] = {
+                                        "composer": result.listing.composer,
+                                        "title": result.listing.title,
+                                        "subtitle": result.listing.subtitle,
+                                        "name": result.listing.name,
+                                        "level": result.listing.level,
+                                        "duration": duration,
+                                        "link": link,
+                                        "description": result.listing.description,
+                                        "param": result.listing.param
+                                    }
+
+                                    var obj = {
+                                        listings: listings
+                                    }
+
+                                    let json = JSON.stringify(obj, null, 2);
+                                    fs.writeFile(path, json, function (error) {
+                                        if (error) throw error;
+                                        Utility.DebugLog('File Updated');
+                                    });
+                                })
+                                .catch(console.log);
+                        }
                     })
                     .catch(console.log);
-        
-                //TODO: Sets info and continues
             }
-
+            
             await Utility.Sleep(1000);
 
             console.log("Duration: " + getDur(duration));
 
-            var desctext = Utility.AddEmpty(result.description);
-            var verify = Utility.CheckValue(SearchUtil.readParam(result.param, "verify"), "This is a verified entry. Please feel free to use it.",
+            var desctext = Utility.AddEmpty(result.listing.description);
+            var verify = Utility.CheckValue(SearchUtil.readParam(result.listing.param, "verify"), "This is a verified entry. Please feel free to use it.",
                 "This is NOT a verified entry. Please take the information cautiously");
-            var prdtext = piecePeriod(SearchUtil.readParam(result.param, "period"));
-            var son = Utility.CheckValue(SearchUtil.readParam(result.param, "sonata"), '✅', '❌');
-            var et = Utility.CheckValue(SearchUtil.readParam(result.param, "etude"), '✅', '❌');
+            var prdtext = piecePeriod(SearchUtil.readParam(result.listing.param, "period"));
+            var son = Utility.CheckValue(SearchUtil.readParam(result.listing.param, "sonata"), '✅', '❌');
+            var et = Utility.CheckValue(SearchUtil.readParam(result.listing.param, "etude"), '✅', '❌');
 
             return new MessageEmbed()
                 .setColor(color)
@@ -182,16 +210,16 @@ module.exports = {
                 .setThumbnail('https://i.imgur.com/CyjXR7H.png')
                 .addFields({
                     name: 'Composer',
-                    value: Utility.AddEmpty(result.composer)
+                    value: Utility.AddEmpty(result.listing.composer)
                 }, {
                     name: 'Title',
-                    value: Utility.AddEmpty(result.title),
+                    value: Utility.AddEmpty(result.listing.title),
                 }, {
-                    name: Utility.AddEmpty(result.subtitle),
-                    value: Utility.AddEmpty(result.name),
+                    name: Utility.AddEmpty(result.listing.subtitle),
+                    value: Utility.AddEmpty(result.listing.name),
                 }, {
                     name: 'Level',
-                    value: `${result.level}`
+                    value: `${result.listing.level}`
                 },{
                     name: 'Duration',
                     value: getDur(duration)

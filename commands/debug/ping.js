@@ -12,7 +12,8 @@ module.exports = {
             \nMessage Created at : ${message.createdTimestamp}
             \nTook : ${latency}`);
         } else {
-            message.channel.send(`Hiya I am ${latency}ms late. Not too bad :smile:`);
+            var text = latency > 0 ? "late. Not too bad :smile:" : "early. Just shows that I am ahead of my time :sunglasses:";
+            message.channel.send(`Hiya I am ${latency}ms ${text}`);
         }
     },
 };

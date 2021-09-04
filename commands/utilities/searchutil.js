@@ -1,5 +1,3 @@
-const search = require("../piece info/search");
-
 //The minimum score of a string for it to be qualified a search result. The score is on a scale of 0 to 1.
 const threshold = 0.95;
 

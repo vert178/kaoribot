@@ -1,8 +1,8 @@
 const puppeteer = require("puppeteer");
 const fs = require("fs");
 const readline = require("readline");
-const Utility = require("./../utilities/utility.js");
-const Search = require("./../utilities/searchutil.js");
+const Utility = require("../utilities/utility.js");
+const Search = require("../utilities/searchutil.js");
 const emptystring = '\u200b';
 
 module.exports = {
@@ -17,6 +17,7 @@ module.exports = {
         var path = isComposer ? './data/bybook.json' : './data/bypiece.json';
 
         message.channel.send("Update initiated! Please wait.");
+        let t1 = Date.now();
 
         var obj = {
             listings: []
@@ -33,7 +34,9 @@ module.exports = {
         });
 
         const page = await browser.newPage();
-        Utility.DebugLog("Update initiated. Browser launched");
+        Utility.DebugLog(`Update initiated. Browser launched. There are 
+        ${BaroqueComposers.length + ClassicalComposers.length + RomanticComposers.length + ModernComposers.length} composers. 
+        Please make sure this is correct before I go any further`);
         //await page.setRequestInterception(true);
         await page.setDefaultNavigationTimeout(0);
         //Goto target URL
@@ -101,8 +104,14 @@ module.exports = {
                     var level = levelValue[j];
                     var period = getPeriod(composer.trim());
 
+                    //Skip if no level found, or if the composer is unknown, or if there are duplicate entries
                     if (level === undefined) continue;
                     if (period > 3) continue;
+                    if (obj.listings.find(e => 
+                        e.composer.trim() === composer.trim() &&
+                        e.name.trim() === name.trim() &&
+                        e.title.trim() === title.trim() &&
+                        e.subtitle.trim() === subtitle.trim())) continue;
                     if (title.trim() === subtitle.trim()) subtitle = emptystring;
 
                     var entry = {
@@ -118,8 +127,7 @@ module.exports = {
                     }
 
                     console.log(entry);
-
-                    obj.listings.push();
+                    obj.listings.push(entry);
                 }
             }
         }
@@ -127,8 +135,10 @@ module.exports = {
         let json = JSON.stringify(obj, null, 2);
         fs.writeFile(path, json, function (error) {
             if (error) throw error;
+            let t2 = Date.now();
+            var timeTaken = Math.round((t2 - t1)/6000)/10;
             Utility.DebugLog('File Saved!!!');
-            return message.reply("Done!")
+            return message.reply(`Done! Took me ${timeTaken} minutes to make ${obj.listings.length} entries. Now may I have bubble tea? :bubble_tea:`);
         });
 
         browser.close();
@@ -165,7 +175,6 @@ function getParam(name, composer) {
 
     var period = getPeriod(composer.trim());
     param = Search.setParam(param, "period", period);
-    Utility.DebugLog(period + "    " + param);
 
     var sonata = Utility.StringContainAtLeast(name, ["sonata", "movement", "movements"], 1);
     var etude = Utility.StringContainAtLeast(name, ["étude", "etude", "etudes", "études", "toccata", "study"], 1);
