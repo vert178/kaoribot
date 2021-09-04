@@ -24,7 +24,7 @@ module.exports = {
         var howMany = 0;
 
         if (args[0].toLowerCase() === 'a' || args[0].toLowerCase() === 'an') howMany = 1;
-        else if (Utility.isPositiveInteger(args[0])) howMany = Number(args[0]);
+        else if (Number(args[0]) && Number(args[0]) > 0) howMany = Number(args[0]);
         else return message.channel.send("Whoops that's not a valid command!");
 
         var arr = [];

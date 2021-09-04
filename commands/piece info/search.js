@@ -191,7 +191,7 @@ module.exports = {
                     })
                     .catch(console.log);
             }
-            
+
             await Utility.Sleep(1000);
 
             console.log("Duration: " + getDur(duration));

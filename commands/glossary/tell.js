@@ -30,6 +30,7 @@ module.exports = {
     cooldown: 5,
     async execute(message, args, Utility) {
         
+        return message.reply('This function is still under development. Come back  later!')
         const workbook = await Utility.loadExcel(true);
         const worksheet = workbook.worksheets[1];
         const votesheet = workbook.worksheets[2];
