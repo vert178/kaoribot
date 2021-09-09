@@ -1,6 +1,6 @@
 {
   "name": "kaori",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "宮園 香織. Keeper of the legendary UwU/Birdseed scale of piano difficulty. Piano information/technique/faqs compiled by Henle Publications and the wonderful MitK community. Also she can do some other stuff. Say \"Kaori, help\" for more info",
   "main": "index.js",
   "scripts": {
