@@ -5,7 +5,7 @@ module.exports = {
     hidden: true,
     userRestricted: true,
     async execute(message, args) {
-        message.delete();
         message.channel.send(Utility.RemergeArgs(args));
+        message.delete().catch(console.log);
     },
 };

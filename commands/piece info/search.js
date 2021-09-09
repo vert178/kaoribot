@@ -82,15 +82,21 @@ module.exports = {
 
             menuCollector.on('collect', async i => {
 
+                try {
+                    await i.deferUpdate();
+                } catch (error) {
+                    console.log(error);
+                    return message.channel.send({
+                        content: "I am recieving trash from Discord servers. Google said Discord API just \"does that sometimes\"... I hate this. Please try again.",
+                        components: [],
+                    });
+                }
+
                 if (!i.isSelectMenu() && !i.isButton()) {
-                    await m.edit({
+                    return m.edit({
                         content: "Wrong type of interaction...? Weird. Please tell vert about it.",
                         components: [],
                     });
-
-                    await i.deferUpdate();
-                    return;
-
                 } else if (i.isButton()) {
 
                     // Change page number
@@ -103,8 +109,6 @@ module.exports = {
                         content: msg.prompt,
                         components: [msg.menu, msg.page]
                     });
-
-                    await i.deferUpdate();
     
                     menuCollector.resetTimer();
 
@@ -114,8 +118,6 @@ module.exports = {
                         id: found[Number(i.values) - 1] - 1,
                         listing: listings[found[Number(i.values) - 1] - 1],
                     }
-
-                    await i.deferUpdate();
 
                     //Create the embed
                     var resultEmbed = await createPieceEmbed(result, searchString);
